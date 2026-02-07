@@ -38,14 +38,14 @@ type DisconnectRecord struct {
 
 // WorkerContext tracks recent worker events for a session to enrich disconnect reasons
 type WorkerContext struct {
-	Username      string
-	ClientIP      string
-	Server        string
-	HadBye        bool      // received BYE packet
-	DPDWarning    bool      // had DPD warning before disconnect
-	DPDSeconds    int       // last DPD warning seconds
-	SecModClose   bool      // sec-mod temporarily closed session (mobile sleep)
-	LastUpdate    time.Time // for cleanup
+	Username    string
+	ClientIP    string
+	Server      string
+	HadBye      bool      // received BYE packet
+	DPDWarning  bool      // had DPD warning before disconnect
+	DPDSeconds  int       // last DPD warning seconds
+	SecModClose bool      // sec-mod temporarily closed session (mobile sleep)
+	LastUpdate  time.Time // for cleanup
 }
 
 // GeoIPResolver resolves IP addresses to country information

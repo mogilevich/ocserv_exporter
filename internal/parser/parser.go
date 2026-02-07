@@ -17,25 +17,25 @@ const (
 	EventSessionInvalidate
 	EventVPNIPAssigned
 	EventAuthFailed
-	EventByePacket    // worker received BYE packet from client
-	EventDPDWarning   // worker DPD timeout warning
-	EventSecModClose  // sec-mod temporarily closing session (mobile sleep)
+	EventByePacket   // worker received BYE packet from client
+	EventDPDWarning  // worker DPD timeout warning
+	EventSecModClose // sec-mod temporarily closing session (mobile sleep)
 )
 
 // Event represents a parsed ocserv log event
 type Event struct {
-	Type      EventType
-	Timestamp time.Time
-	Server    string // VPN server name (e.g., "ocserv", "ocserv-ru")
-	Username  string
-	ClientIP  string
-	Port      int
-	VpnIP     string
-	SessionID string
-	Reason    string
-	RxBytes   uint64
-	TxBytes   uint64
-	Raw       string
+	Type       EventType
+	Timestamp  time.Time
+	Server     string // VPN server name (e.g., "ocserv", "ocserv-ru")
+	Username   string
+	ClientIP   string
+	Port       int
+	VpnIP      string
+	SessionID  string
+	Reason     string
+	RxBytes    uint64
+	TxBytes    uint64
+	Raw        string
 	DPDSeconds int // seconds since last DPD (for EventDPDWarning)
 }
 

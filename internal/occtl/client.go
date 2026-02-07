@@ -13,16 +13,16 @@ import (
 
 // ServerStatus contains parsed data from "occtl show status"
 type ServerStatus struct {
-	ActiveSessions     int
-	TotalSessions      int
-	AuthFailures       int
-	RxBytes            int64
-	TxBytes            int64
-	LatencyMedianMs    float64
-	LatencyStdevMs     float64
-	AvgSessionTimeSec  float64
-	MaxSessionTimeSec  float64
-	UptimeSeconds      float64
+	ActiveSessions    int
+	TotalSessions     int
+	AuthFailures      int
+	RxBytes           int64
+	TxBytes           int64
+	LatencyMedianMs   float64
+	LatencyStdevMs    float64
+	AvgSessionTimeSec float64
+	MaxSessionTimeSec float64
+	UptimeSeconds     float64
 }
 
 // Session contains parsed data from "occtl show sessions all"
@@ -130,16 +130,16 @@ func parseStatus(output string) (*ServerStatus, error) {
 	status := &ServerStatus{}
 
 	patterns := map[string]*regexp.Regexp{
-		"active":      regexp.MustCompile(`Active sessions:\s*(\d+)`),
-		"total":       regexp.MustCompile(`Total sessions:\s*(\d+)`),
-		"authFail":    regexp.MustCompile(`Total authentication failures:\s*(\d+)`),
-		"rx":          regexp.MustCompile(`RX:\s*([\d.]+)\s*(\w+)`),
-		"tx":          regexp.MustCompile(`TX:\s*([\d.]+)\s*(\w+)`),
-		"latencyMed":  regexp.MustCompile(`Median latency:\s*<?(\d+)m?s?`),
-		"latencyStd":  regexp.MustCompile(`STDEV latency:\s*<?(\d+)m?s?`),
-		"avgSession":  regexp.MustCompile(`Average session time:\s*(.+)`),
-		"maxSession":  regexp.MustCompile(`Max session time:\s*(.+)`),
-		"uptime":      regexp.MustCompile(`Up since:.+\(\s*(.+?)\s*\)`),
+		"active":     regexp.MustCompile(`Active sessions:\s*(\d+)`),
+		"total":      regexp.MustCompile(`Total sessions:\s*(\d+)`),
+		"authFail":   regexp.MustCompile(`Total authentication failures:\s*(\d+)`),
+		"rx":         regexp.MustCompile(`RX:\s*([\d.]+)\s*(\w+)`),
+		"tx":         regexp.MustCompile(`TX:\s*([\d.]+)\s*(\w+)`),
+		"latencyMed": regexp.MustCompile(`Median latency:\s*<?(\d+)m?s?`),
+		"latencyStd": regexp.MustCompile(`STDEV latency:\s*<?(\d+)m?s?`),
+		"avgSession": regexp.MustCompile(`Average session time:\s*(.+)`),
+		"maxSession": regexp.MustCompile(`Max session time:\s*(.+)`),
+		"uptime":     regexp.MustCompile(`Up since:.+\(\s*(.+?)\s*\)`),
 	}
 
 	lines := strings.Split(output, "\n")
@@ -256,7 +256,8 @@ func parseSessions(output string) ([]Session, error) {
 
 // parseUsers parses output of "occtl show users"
 // Format:       id     user    vhost             ip         vpn-ip device   since    dtls-cipher    status
-//          3800826 a.zakiev  default   172.30.30.30    10.88.18.67 ocserv-ru3    35s      (no-dtls) connected
+//
+//	3800826 a.zakiev  default   172.30.30.30    10.88.18.67 ocserv-ru3    35s      (no-dtls) connected
 func parseUsers(output string) ([]User, error) {
 	var users []User
 
