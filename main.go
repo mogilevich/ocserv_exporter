@@ -64,18 +64,15 @@ func main() {
 	coll := collector.New()
 
 	// Initialize GeoIP if database path provided
+	var resolver *geoip.Resolver
 	if *geoipDB != "" {
-		resolver, err := geoip.NewResolver(*geoipDB)
+		var err error
+		resolver, err = geoip.NewResolver(*geoipDB)
 		if err != nil {
 			log.Printf("Warning: Failed to load GeoIP database: %v", err)
 		} else {
 			coll.SetGeoIPResolver(resolver)
 			log.Printf("GeoIP database loaded: %s", *geoipDB)
-			defer func() {
-				if err := resolver.Close(); err != nil {
-					log.Printf("Error closing GeoIP resolver: %v", err)
-				}
-			}()
 		}
 	}
 
@@ -222,6 +219,13 @@ func main() {
 
 		log.Println("Shutting down...")
 		cancel()
+
+		// Close GeoIP resolver if initialized
+		if resolver != nil {
+			if err := resolver.Close(); err != nil {
+				log.Printf("Error closing GeoIP resolver: %v", err)
+			}
+		}
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer shutdownCancel()
