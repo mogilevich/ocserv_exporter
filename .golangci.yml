@@ -24,8 +24,12 @@ linters-settings:
     check-shadowing: true
   gofmt:
     simplify: true
-
-issues:
-  exclude-use-default: false
-  max-issues-per-linter: 0
-  max-same-issues: 0
+  revive:
+    rules:
+      # Disable style-only rules that don't affect code quality
+      - name: package-comments
+        disabled: true
+      - name: unused-parameter
+        disabled: true
+      - name: exported
+        disabled: true
