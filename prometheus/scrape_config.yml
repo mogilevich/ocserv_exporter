@@ -1,0 +1,15 @@
+# Add this job to your prometheus.yml scrape_configs section
+#
+# Example:
+#   scrape_configs:
+#     - job_name: 'ocserv'
+#       ... (config below)
+
+- job_name: 'ocserv'
+  static_configs:
+    - targets: ['vpn-server:9617']
+      labels:
+        instance: 'vpn1'
+  # Optional: increase scrape interval for VPN metrics
+  # scrape_interval: 30s
+  # scrape_timeout: 10s

@@ -1,0 +1,77 @@
+# Prometheus Alerting Rules for ocserv-exporter
+# Uncomment rules as needed
+
+groups:
+  - name: ocserv
+    rules:
+      # Alert when exporter stops receiving events (stale data)
+      # - alert: OcservExporterStale
+      #   expr: time() - ocserv_last_event_timestamp > 3600
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "ocserv exporter not receiving events"
+      #     description: "No events received from {{ $labels.server }} for over 1 hour"
+
+      # Alert on high reconnect rate (potential connectivity issues)
+      # - alert: OcservHighReconnectRate
+      #   expr: rate(ocserv_reconnects_total[15m]) > 0.1
+      #   for: 10m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "High VPN reconnect rate"
+      #     description: "User {{ $labels.username }} on {{ $labels.server }} has high reconnect rate"
+
+      # Alert on problematic sessions (many short sessions with errors)
+      # - alert: OcservProblematicUser
+      #   expr: increase(ocserv_problematic_sessions_total[1h]) > 5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "User experiencing connection problems"
+      #     description: "User {{ $labels.username }} on {{ $labels.server }} has {{ $value }} problematic sessions in the last hour (reason: {{ $labels.reason }})"
+
+      # Alert when no active sessions (all users disconnected)
+      # - alert: OcservNoActiveSessions
+      #   expr: sum(ocserv_active_sessions) == 0
+      #   for: 30m
+      #   labels:
+      #     severity: info
+      #   annotations:
+      #     summary: "No active VPN sessions"
+      #     description: "No users connected to VPN for 30 minutes"
+
+      # Alert on unusual number of concurrent sessions for a user
+      # - alert: OcservManyConcurrentSessions
+      #   expr: ocserv_concurrent_sessions_max > 3
+      #   for: 5m
+      #   labels:
+      #     severity: info
+      #   annotations:
+      #     summary: "User with many concurrent VPN sessions"
+      #     description: "User {{ $labels.username }} on {{ $labels.server }} has {{ $value }} concurrent sessions"
+
+      # Alert on high error disconnect rate
+      # - alert: OcservHighErrorRate
+      #   expr: |
+      #     rate(ocserv_disconnections_total{reason!="user disconnected"}[15m])
+      #     / rate(ocserv_disconnections_total[15m]) > 0.3
+      #   for: 10m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: "High VPN error disconnect rate"
+      #     description: "Server {{ $labels.server }} has high rate of error disconnections"
+
+      # Alert when exporter is down
+      # - alert: OcservExporterDown
+      #   expr: up{job="ocserv-exporter"} == 0
+      #   for: 5m
+      #   labels:
+      #     severity: critical
+      #   annotations:
+      #     summary: "ocserv exporter is down"
+      #     description: "ocserv-exporter instance {{ $labels.instance }} is not responding"

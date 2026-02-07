@@ -1,0 +1,37 @@
+[Unit]
+Description=Prometheus exporter for ocserv VPN
+Documentation=https://github.com/mogilevich/ocserv_exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ocserv-exporter
+Group=systemd-journal
+ExecStart=/usr/local/bin/ocserv-exporter \
+    --web.listen-address=:9617 \
+    --journal.unit=ocserv \
+    --journal.unit=ocserv-ru \
+    --journal.since=24h
+# GeoIP (optional):
+#   Add backslash to line above, then uncomment:
+#   --geoip.db=/etc/ocserv-exporter/GeoLite2-Country.mmdb
+# occtl integration (optional):
+#   Add backslash to line above, then uncomment:
+#   --occtl.enabled \
+#   --occtl.socket=ocserv \
+#   --occtl.socket=ocserv-ru:/var/run/ocserv-ru.socket \
+#   --occtl.interval=30s
+
+Restart=on-failure
+RestartSec=5s
+
+# Security hardening
+# Note: NoNewPrivileges=yes is incompatible with occtl integration (requires sudo)
+# NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

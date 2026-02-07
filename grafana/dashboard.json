@@ -1,0 +1,413 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "Server Statistics (occtl)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "decbytes" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "id": 20,
+      "options": { "displayMode": "lcd", "minVizHeight": 10, "minVizWidth": 0, "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+      "targets": [{ "expr": "ocserv_server_rx_bytes_total{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Server RX Total",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "decbytes" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
+      "id": 21,
+      "options": { "displayMode": "lcd", "minVizHeight": 10, "minVizWidth": 0, "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+      "targets": [{ "expr": "ocserv_server_tx_bytes_total{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Server TX Total",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+      "id": 22,
+      "options": { "displayMode": "lcd", "minVizHeight": 10, "minVizWidth": 0, "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+      "targets": [{ "expr": "ocserv_server_active_sessions{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Active Sessions",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.05 }, { "color": "red", "value": 0.1 }] }, "unit": "s" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
+      "id": 23,
+      "options": { "displayMode": "lcd", "minVizHeight": 10, "minVizWidth": 0, "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+      "targets": [{ "expr": "ocserv_server_latency_median_seconds{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Latency (Median)",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "s" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
+      "id": 24,
+      "options": { "displayMode": "lcd", "minVizHeight": 10, "minVizWidth": 0, "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+      "targets": [{ "expr": "ocserv_server_avg_session_time_seconds{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Avg Session Time",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "s" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
+      "id": 25,
+      "options": { "displayMode": "lcd", "minVizHeight": 10, "minVizWidth": 0, "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+      "targets": [{ "expr": "ocserv_server_uptime_seconds{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Server Uptime",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "decbytes" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 14 },
+      "id": 26,
+      "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [
+        { "expr": "ocserv_server_rx_bytes_total{server=~\"$server\"}", "legendFormat": "{{ server }} RX", "refId": "A" },
+        { "expr": "ocserv_server_tx_bytes_total{server=~\"$server\"}", "legendFormat": "{{ server }} TX", "refId": "B" }
+      ],
+      "title": "Server Traffic (Real-time)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 14 },
+      "id": 27,
+      "options": { "displayLabels": ["percent"], "legend": { "displayMode": "list", "placement": "right", "showLegend": true }, "pieType": "pie", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "sum by (client_type) (ocserv_sessions_by_client_type{server=~\"$server\"})", "legendFormat": "{{ client_type }}", "refId": "A" }],
+      "title": "Sessions by VPN Client Type",
+      "type": "piechart"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "s" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 14 },
+      "id": 28,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [
+        { "expr": "ocserv_server_latency_median_seconds{server=~\"$server\"}", "legendFormat": "{{ server }} median", "refId": "A" },
+        { "expr": "ocserv_server_latency_stdev_seconds{server=~\"$server\"}", "legendFormat": "{{ server }} stdev", "refId": "B" }
+      ],
+      "title": "Server Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [{ "matcher": { "id": "byName", "options": "server" }, "properties": [{ "id": "custom.width", "value": 90 }] }, { "matcher": { "id": "byName", "options": "client_type" }, "properties": [{ "id": "custom.width", "value": 140 }] }, { "matcher": { "id": "byName", "options": "Sessions" }, "properties": [{ "id": "custom.width", "value": 80 }] }] },
+      "gridPos": { "h": 10, "w": 5, "x": 10, "y": 22 },
+      "id": 29,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Sessions" }] },
+      "targets": [{ "expr": "ocserv_sessions_by_client_type{server=~\"$server\"}", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "VPN Clients Detail (Active)",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true }, "indexByName": { "server": 0, "client_type": 1, "Value": 2 }, "renameByName": { "Value": "Sessions" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Number of active sessions grouped by country",
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [{ "matcher": { "id": "byName", "options": "country" }, "properties": [{ "id": "custom.width", "value": 110 }] }, { "matcher": { "id": "byName", "options": "Sessions" }, "properties": [{ "id": "custom.width", "value": 70 }] }] },
+      "gridPos": { "h": 10, "w": 3, "x": 15, "y": 22 },
+      "id": 34,
+      "options": { "cellHeight": "sm", "footer": { "countRows": true, "fields": "", "reducer": ["sum"], "show": true }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Sessions" }] },
+      "targets": [{ "expr": "count by (country) (ocserv_session_info{server=~\"$server\",username=~\"$username\"})", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Active Sessions by Country",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "Value": "Sessions" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [{ "matcher": { "id": "byName", "options": "Value" }, "properties": [{ "id": "unit", "value": "dateTimeFromNow" }, { "id": "custom.width", "value": 140 }] }, { "matcher": { "id": "byName", "options": "server" }, "properties": [{ "id": "custom.width", "value": 90 }] }, { "matcher": { "id": "byName", "options": "username" }, "properties": [{ "id": "custom.width", "value": 110 }] }, { "matcher": { "id": "byName", "options": "country" }, "properties": [{ "id": "custom.width", "value": 110 }] }, { "matcher": { "id": "byName", "options": "vpn_ip" }, "properties": [{ "id": "custom.width", "value": 110 }] }, { "matcher": { "id": "byName", "options": "client_type" }, "properties": [{ "id": "custom.width", "value": 90 }] }] },
+      "gridPos": { "h": 10, "w": 10, "x": 0, "y": 22 },
+      "id": 30,
+      "options": { "cellHeight": "sm", "footer": { "countRows": true, "fields": "", "reducer": ["count"], "show": true }, "showHeader": true, "sortBy": [{ "desc": false, "displayName": "Value" }] },
+      "targets": [{ "expr": "ocserv_session_info{server=~\"$server\",username=~\"$username\"} * 1000", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Online Users (Active)",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true }, "indexByName": { "server": 0, "username": 1, "country": 2, "vpn_ip": 3, "client_type": 4, "Value": 5 } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Users who were online during the selected time range. Online time is approximate (based on 30s scrape interval).",
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [{ "matcher": { "id": "byName", "options": "server" }, "properties": [{ "id": "custom.width", "value": 100 }] }, { "matcher": { "id": "byName", "options": "username" }, "properties": [{ "id": "custom.width", "value": 120 }] }, { "matcher": { "id": "byName", "options": "Online" }, "properties": [{ "id": "unit", "value": "s" }] }] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 40 },
+      "id": 31,
+      "options": { "cellHeight": "sm", "footer": { "countRows": true, "fields": "", "reducer": ["count"], "show": true }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Online" }] },
+      "targets": [{ "expr": "max by (server, username) (count_over_time(ocserv_session_info{server=~\"$server\",username=~\"$username\"}[$__range])) * 30", "format": "table", "instant": true, "intervalMs": 1000, "legendFormat": "", "refId": "A" }],
+      "title": "Session History",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "Value": "Online" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Shows users who were online but are currently OFFLINE. Last time they disconnected within the selected time range.",
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [{ "matcher": { "id": "byName", "options": "server" }, "properties": [{ "id": "custom.width", "value": 100 }] }, { "matcher": { "id": "byName", "options": "username" }, "properties": [{ "id": "custom.width", "value": 120 }] }, { "matcher": { "id": "byName", "options": "Last Seen" }, "properties": [{ "id": "unit", "value": "dateTimeFromNow" }] }] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 40 },
+      "id": 32,
+      "options": { "cellHeight": "sm", "footer": { "countRows": true, "fields": "", "reducer": ["count"], "show": true }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Last Seen" }] },
+      "targets": [{ "expr": "(max by (server, username) (max_over_time(timestamp(ocserv_session_info{server=~\"$server\",username=~\"$username\"})[$__range:1m])) unless ocserv_session_info{server=~\"$server\",username=~\"$username\"}) * 1000", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Last Seen",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "Value": "Last Seen" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Total online time by country during the selected time range. Based on session history data.",
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "s" }, "overrides": [{ "matcher": { "id": "byName", "options": "country" }, "properties": [{ "id": "custom.width", "value": 120 }] }, { "matcher": { "id": "byName", "options": "Users" }, "properties": [{ "id": "unit", "value": "short" }] }] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 40 },
+      "id": 35,
+      "options": { "cellHeight": "sm", "footer": { "countRows": true, "fields": "", "reducer": ["sum"], "show": true }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Online Time" }] },
+      "targets": [
+        { "expr": "sum by (country) (count_over_time(ocserv_session_info{server=~\"$server\",username=~\"$username\"}[$__range])) * 30", "format": "table", "instant": true, "legendFormat": "", "refId": "A" },
+        { "expr": "count by (country) (max by (server, username, country) (count_over_time(ocserv_session_info{server=~\"$server\",username=~\"$username\"}[$__range])))", "format": "table", "instant": true, "legendFormat": "", "refId": "B" }
+      ],
+      "title": "Sessions by Country (History)",
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true }, "indexByName": { "country": 0, "Value #A": 1, "Value #B": 2 }, "renameByName": { "Value #A": "Online Time", "Value #B": "Users" } } }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 2 }, { "color": "red", "value": 3 }] }, "unit": "short" }, "overrides": [{ "matcher": { "id": "byName", "options": "server" }, "properties": [{ "id": "custom.width", "value": 90 }] }, { "matcher": { "id": "byName", "options": "username" }, "properties": [{ "id": "custom.width", "value": 140 }] }, { "matcher": { "id": "byName", "options": "Sessions" }, "properties": [{ "id": "custom.width", "value": 80 }] }] },
+      "gridPos": { "h": 10, "w": 6, "x": 18, "y": 22 },
+      "id": 15,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Sessions" }] },
+      "targets": [{ "expr": "ocserv_user_concurrent_sessions{server=~\"$server\",username=~\"$username\"} > 1", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Users with Multiple Sessions (Active)",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true }, "renameByName": { "Value": "Sessions" } } }],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 56 },
+      "id": 101,
+      "panels": [],
+      "title": "User Statistics (journal)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 6 },
+      "id": 1,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "expr": "sum(ocserv_server_active_sessions{server=~\"$server\"})", "legendFormat": "Total", "refId": "A" }],
+      "title": "Active Sessions (Total)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5 }, { "color": "red", "value": 10 }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 57 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "expr": "round(sum(increase(ocserv_reconnects_total{server=~\"$server\",username=~\"$username\"}[$__range])))", "legendFormat": "", "refId": "A" }],
+      "title": "Reconnects",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 3 }, { "color": "red", "value": 10 }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 57 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "expr": "round(sum(increase(ocserv_problematic_sessions_total{server=~\"$server\",username=~\"$username\"}[$__range])))", "legendFormat": "", "refId": "A" }],
+      "title": "Problematic Sessions",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "decbytes" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 57 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "expr": "sum(increase(ocserv_received_bytes_total{server=~\"$server\",username=~\"$username\"}[$__range])) + sum(increase(ocserv_sent_bytes_total{server=~\"$server\",username=~\"$username\"}[$__range]))", "legendFormat": "", "refId": "A" }],
+      "title": "Traffic",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 10 }, { "color": "red", "value": 50 }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 57 },
+      "id": 6,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "expr": "round(sum(increase(ocserv_auth_failed_total{server=~\"$server\",username=~\"$username\"}[$__range])))", "legendFormat": "", "refId": "A" }],
+      "title": "Auth Failed",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 6 },
+      "id": 7,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "ocserv_server_active_sessions{server=~\"$server\"}", "legendFormat": "{{ server }}", "refId": "A" }],
+      "title": "Active Sessions Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 62 },
+      "id": 8,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [
+        { "expr": "round(sum(increase(ocserv_reconnects_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))", "legendFormat": "Reconnects", "refId": "A" },
+        { "expr": "round(sum(increase(ocserv_problematic_sessions_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))", "legendFormat": "Problematic", "refId": "B" }
+      ],
+      "title": "Reconnects & Problematic Sessions",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "normal" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "Bps" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 70 },
+      "id": 9,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "sum by (username) (rate(ocserv_received_bytes_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval]))", "legendFormat": "{{ username }} RX", "refId": "A" }],
+      "title": "Traffic Received by User",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "normal" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "Bps" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 70 },
+      "id": 10,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "sum by (username) (rate(ocserv_sent_bytes_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval]))", "legendFormat": "{{ username }} TX", "refId": "A" }],
+      "title": "Traffic Sent by User",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 78 },
+      "id": 11,
+      "options": { "displayLabels": ["percent"], "legend": { "displayMode": "list", "placement": "right", "showLegend": true }, "pieType": "pie", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "round(sum by (reason) (increase(ocserv_disconnections_total{server=~\"$server\",username=~\"$username\"}[$__range])))", "legendFormat": "{{ reason }}", "refId": "A" }],
+      "title": "Disconnect Reasons",
+      "type": "piechart"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 86 },
+      "id": 12,
+      "options": { "displayLabels": ["percent"], "legend": { "displayMode": "list", "placement": "right", "showLegend": true }, "pieType": "pie", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "round(sum by (country) (increase(ocserv_connections_by_country_total{server=~\"$server\",username=~\"$username\"}[$__range])))", "legendFormat": "{{ country }}", "refId": "A" }],
+      "title": "Connections by Country",
+      "type": "piechart"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "decbytes" }, "overrides": [{ "matcher": { "id": "byName", "options": "username" }, "properties": [{ "id": "custom.width", "value": 150 }] }, { "matcher": { "id": "byName", "options": "server" }, "properties": [{ "id": "custom.width", "value": 100 }] }] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 78 },
+      "id": 13,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Total" }] },
+      "targets": [{ "expr": "sum by (server, username) (increase(ocserv_received_bytes_total{server=~\"$server\",username=~\"$username\"}[$__range]) + increase(ocserv_sent_bytes_total{server=~\"$server\",username=~\"$username\"}[$__range]))", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Top Users by Traffic",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "Value": "Total" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 3 }, { "color": "red", "value": 5 }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 78 },
+      "id": 14,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Problematic" }] },
+      "targets": [{ "expr": "round(sum by (server, username, reason) (increase(ocserv_problematic_sessions_total{server=~\"$server\",username=~\"$username\"}[$__range]))) > 0", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Problematic Users",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "indexByName": { "server": 0, "username": 1, "reason": 2, "Value": 3 }, "renameByName": { "Value": "Problematic" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 102 },
+      "id": 16,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "round(sum(increase(ocserv_auth_failed_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))", "legendFormat": "Failed Auth", "refId": "A" }],
+      "title": "Failed Authentication Attempts",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 10 }, { "color": "red", "value": 50 }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 102 },
+      "id": 17,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Failed" }] },
+      "targets": [{ "expr": "round(sum by (server, username, client_ip, country) (increase(ocserv_auth_failed_total{server=~\"$server\",username=~\"$username\"}[$__range]))) > 0", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Failed Auth by IP",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "indexByName": { "server": 0, "username": 1, "client_ip": 2, "country": 3, "Value": 4 }, "renameByName": { "Value": "Failed" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 102 },
+      "id": 33,
+      "options": { "displayLabels": ["percent"], "legend": { "displayMode": "list", "placement": "right", "showLegend": true }, "pieType": "pie", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "round(sum by (country) (increase(ocserv_auth_failed_total{server=~\"$server\",username=~\"$username\"}[$__range])))", "legendFormat": "{{ country }}", "refId": "A" }],
+      "title": "Failed Auth by Country",
+      "type": "piechart"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [{ "matcher": { "id": "byName", "options": "country" }, "properties": [{ "id": "custom.width", "value": 150 }] }, { "matcher": { "id": "byName", "options": "country_code" }, "properties": [{ "id": "custom.width", "value": 50 }] }] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 86 },
+      "id": 18,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Connections" }] },
+      "targets": [{ "expr": "round(sum by (server, country, country_code) (increase(ocserv_connections_by_country_total{server=~\"$server\",username=~\"$username\"}[$__range]))) > 0", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
+      "title": "Connections by Country",
+      "transformations": [{ "id": "organize", "options": { "excludeByName": { "Time": true }, "indexByName": { "server": 0, "country": 1, "country_code": 2, "Value": 3 }, "renameByName": { "Value": "Connections" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "normal" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 86 },
+      "id": 19,
+      "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "right", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "expr": "round(sum by (country) (increase(ocserv_connections_by_country_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))", "legendFormat": "{{ country }}", "refId": "A" }],
+      "title": "Connections by Country Over Time",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["vpn", "ocserv"],
+  "templating": {
+    "list": [
+      { "current": {}, "hide": 0, "includeAll": false, "label": "Datasource", "multi": false, "name": "datasource", "options": [], "query": "prometheus", "queryValue": "", "refresh": 1, "regex": "", "skipUrlSync": false, "type": "datasource" },
+      { "allValue": ".*", "current": {}, "datasource": { "type": "prometheus", "uid": "${datasource}" }, "definition": "label_values(ocserv_active_sessions, server)", "hide": 0, "includeAll": true, "label": "Server", "multi": true, "name": "server", "options": [], "query": { "query": "label_values(ocserv_active_sessions, server)", "refId": "StandardVariableQuery" }, "refresh": 2, "regex": "", "skipUrlSync": false, "sort": 1, "type": "query" },
+      { "allValue": ".*", "current": {}, "datasource": { "type": "prometheus", "uid": "${datasource}" }, "definition": "label_values(ocserv_active_sessions{server=~\"$server\",username=~\"$username\"}, username)", "hide": 0, "includeAll": true, "label": "Username", "multi": true, "name": "username", "options": [], "query": { "query": "label_values(ocserv_active_sessions{server=~\"$server\",username=~\"$username\"}, username)", "refId": "StandardVariableQuery" }, "refresh": 2, "regex": "", "skipUrlSync": false, "sort": 1, "type": "query" }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "ocserv VPN",
+  "uid": "ocserv-vpn",
+  "version": 8,
+  "weekStart": ""
+}

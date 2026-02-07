@@ -1,0 +1,219 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23.0'
+        cache: true
+
+    - name: Install cross-compilation tools
+      if: matrix.goarch == 'arm64'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-aarch64-linux-gnu
+
+    - name: Install libsystemd-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsystemd-dev
+
+    - name: Get version
+      id: version
+      run: |
+        VERSION=$(git describe --tags --always --dirty)
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CC: ${{ matrix.goarch == 'arm64' && 'aarch64-linux-gnu-gcc' || 'gcc' }}
+      run: |
+        CGO_ENABLED=1 go build \
+          -ldflags "-X main.version=${{ steps.version.outputs.version }}" \
+          -o ocserv-exporter-${{ matrix.goos }}-${{ matrix.goarch }} \
+          .
+
+    - name: Prepare distribution
+      run: |
+        ARCH="${{ matrix.goarch }}"
+        DIST_DIR="dist-${ARCH}"
+
+        mkdir -p "${DIST_DIR}/grafana"
+        mkdir -p "${DIST_DIR}/prometheus"
+
+        # Copy binary
+        mv ocserv-exporter-${{ matrix.goos }}-${{ matrix.goarch }} "${DIST_DIR}/ocserv-exporter"
+        chmod +x "${DIST_DIR}/ocserv-exporter"
+
+        # Copy config files
+        cp systemd/ocserv-exporter.service "${DIST_DIR}/"
+        cp grafana/dashboard.json "${DIST_DIR}/grafana/"
+        cp prometheus/alerts.yml "${DIST_DIR}/prometheus/"
+        cp prometheus/scrape_config.yml "${DIST_DIR}/prometheus/"
+        cp README.md "${DIST_DIR}/"
+
+        # Create install script
+        cat > "${DIST_DIR}/install.sh" << 'EOF'
+        #!/bin/bash
+        set -e
+
+        INSTALL_DIR="/usr/local/bin"
+        SERVICE_DIR="/etc/systemd/system"
+        SERVICE_USER="ocserv-exporter"
+
+        echo "Installing ocserv-exporter..."
+
+        # Create service user if doesn't exist
+        if ! id "${SERVICE_USER}" &>/dev/null; then
+            echo "Creating user ${SERVICE_USER}..."
+            sudo useradd -r -s /sbin/nologin -G systemd-journal "${SERVICE_USER}"
+        else
+            sudo usermod -aG systemd-journal "${SERVICE_USER}"
+        fi
+
+        sudo cp ocserv-exporter "${INSTALL_DIR}/"
+        sudo chmod +x "${INSTALL_DIR}/ocserv-exporter"
+        sudo cp ocserv-exporter.service "${SERVICE_DIR}/"
+        sudo systemctl daemon-reload
+
+        echo ""
+        echo "Installation complete!"
+        echo "Next steps:"
+        echo "  1. Enable and start: sudo systemctl enable --now ocserv-exporter"
+        echo "  2. Check status: sudo systemctl status ocserv-exporter"
+        echo "  3. View metrics: curl localhost:9617/metrics"
+        EOF
+        chmod +x "${DIST_DIR}/install.sh"
+
+    - name: Create tarball
+      run: |
+        ARCH="${{ matrix.goarch }}"
+        tar czf ocserv-exporter-${{ steps.version.outputs.tag }}-linux-${ARCH}.tar.gz \
+          -C dist-${ARCH} .
+
+    - name: Generate checksums
+      run: |
+        sha256sum ocserv-exporter-${{ steps.version.outputs.tag }}-linux-${{ matrix.goarch }}.tar.gz \
+          > ocserv-exporter-${{ steps.version.outputs.tag }}-linux-${{ matrix.goarch }}.tar.gz.sha256
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-${{ matrix.goarch }}
+        path: |
+          ocserv-exporter-*.tar.gz
+          ocserv-exporter-*.tar.gz.sha256
+        retention-days: 1
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Consolidate artifacts
+      run: |
+        mkdir -p release-files
+        find artifacts -type f -exec mv {} release-files/ \;
+        ls -lah release-files/
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        PREV_TAG=$(git describe --tags --abbrev=0 ${VERSION}^ 2>/dev/null || echo "")
+
+        cat > release_notes.md << EOF
+        ## OCServ Prometheus Exporter ${VERSION}
+
+        A Prometheus exporter for OpenConnect VPN Server that collects metrics from systemd journal logs and occtl status.
+
+        ### Installation
+
+        Download the appropriate archive for your architecture:
+        - \`ocserv-exporter-${VERSION}-linux-amd64.tar.gz\` - for x86_64 systems
+        - \`ocserv-exporter-${VERSION}-linux-arm64.tar.gz\` - for ARM64 systems (AWS Graviton, Raspberry Pi, etc.)
+
+        Extract and run \`./install.sh\` as root:
+
+        \`\`\`bash
+        tar xzf ocserv-exporter-${VERSION}-linux-amd64.tar.gz
+        sudo ./install.sh
+        \`\`\`
+
+        ### Verification
+
+        Verify checksums before installation:
+        \`\`\`bash
+        sha256sum -c ocserv-exporter-${VERSION}-linux-amd64.tar.gz.sha256
+        \`\`\`
+
+        ### What's Included
+
+        - \`ocserv-exporter\` - Main binary
+        - \`ocserv-exporter.service\` - Systemd service file
+        - \`install.sh\` - Automated installation script
+        - \`grafana/dashboard.json\` - Pre-configured Grafana dashboard
+        - \`prometheus/\` - Alert rules and scrape configs
+        - \`README.md\` - Full documentation
+
+        EOF
+
+        if [ -n "$PREV_TAG" ]; then
+          echo "" >> release_notes.md
+          echo "### Changes since ${PREV_TAG}" >> release_notes.md
+          echo "" >> release_notes.md
+          git log --pretty=format:"- %s (%h)" ${PREV_TAG}..${VERSION} >> release_notes.md
+        fi
+
+        cat release_notes.md
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release-files/*
+        body_path: release_notes.md
+        draft: false
+        prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

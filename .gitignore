@@ -1,0 +1,35 @@
+# Build artifacts
+dist/
+ocserv-exporter
+ocserv-exporter-linux-amd64
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+*.log
+test-*/
+
+# GeoIP database
+*.mmdb
+GeoLite2-*.tar.gz
+
+# Temp build artifacts
+/tmp/
