@@ -31,13 +31,13 @@ func NewJournalReader(units []string, since time.Duration) (*JournalReader, erro
 		unit = strings.TrimSuffix(unit, ".service")
 		match := "_SYSTEMD_UNIT=" + unit + ".service"
 		if err := j.AddMatch(match); err != nil {
-			j.Close()
+			_ = j.Close()
 			return nil, fmt.Errorf("failed to add match for %s: %w", unit, err)
 		}
 		// Add disjunction (OR) between units
 		if i < len(units)-1 {
 			if err := j.AddDisjunction(); err != nil {
-				j.Close()
+				_ = j.Close()
 				return nil, fmt.Errorf("failed to add disjunction: %w", err)
 			}
 		}
@@ -48,13 +48,13 @@ func NewJournalReader(units []string, since time.Duration) (*JournalReader, erro
 		startTime := time.Now().Add(-since)
 		usec := uint64(startTime.UnixMicro())
 		if err := j.SeekRealtimeUsec(usec); err != nil {
-			j.Close()
+			_ = j.Close()
 			return nil, fmt.Errorf("failed to seek: %w", err)
 		}
 	} else {
 		// Start from the end (only new entries)
 		if err := j.SeekTail(); err != nil {
-			j.Close()
+			_ = j.Close()
 			return nil, fmt.Errorf("failed to seek to tail: %w", err)
 		}
 	}

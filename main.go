@@ -71,7 +71,11 @@ func main() {
 		} else {
 			coll.SetGeoIPResolver(resolver)
 			log.Printf("GeoIP database loaded: %s", *geoipDB)
-			defer resolver.Close()
+			defer func() {
+				if err := resolver.Close(); err != nil {
+					log.Printf("Error closing GeoIP resolver: %v", err)
+				}
+			}()
 		}
 	}
 
@@ -135,8 +139,8 @@ func main() {
 			}
 		}()
 	}
-	defer cancel()
 
+	// Start log reader goroutine
 	go func() {
 		var reader journal.Reader
 		var err error
@@ -144,20 +148,27 @@ func main() {
 		if *logFile != "" {
 			reader, err = journal.NewFileReader(*logFile)
 			if err != nil {
+				cancel()
 				log.Fatalf("Failed to open log file: %v", err)
 			}
 			log.Printf("Reading logs from file: %s", *logFile)
 		} else {
 			if runtime.GOOS != "linux" {
+				cancel()
 				log.Fatal("journald is only available on Linux. Use --log.file to read from a file instead.")
 			}
 			reader, err = journal.NewJournalReader(*journalUnits, *journalSince)
 			if err != nil {
+				cancel()
 				log.Fatalf("Failed to open journal: %v", err)
 			}
 			log.Printf("Reading logs from journald units: %v (since %s)", *journalUnits, *journalSince)
 		}
-		defer reader.Close()
+		defer func() {
+			if err := reader.Close(); err != nil {
+				log.Printf("Error closing reader: %v", err)
+			}
+		}()
 
 		for {
 			select {
@@ -180,12 +191,13 @@ func main() {
 			coll.ProcessLogLine(entry.Timestamp, entry.Message, entry.Unit)
 		}
 	}()
+	defer cancel()
 
 	// HTTP server
 	mux := http.NewServeMux()
 	mux.Handle(*metricsPath, promhttp.Handler())
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html>
+		_, _ = w.Write([]byte(`<html>
 <head><title>ocserv Exporter</title></head>
 <body>
 <h1>ocserv Exporter</h1>
@@ -195,7 +207,7 @@ func main() {
 	})
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
+		_, _ = w.Write([]byte("ok"))
 	})
 
 	server := &http.Server{
@@ -214,7 +226,9 @@ func main() {
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer shutdownCancel()
-		server.Shutdown(shutdownCtx)
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			log.Printf("Error during shutdown: %v", err)
+		}
 	}()
 
 	log.Printf("Listening on %s", *listenAddress)
