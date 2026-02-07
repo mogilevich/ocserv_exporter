@@ -191,7 +191,6 @@ func main() {
 			coll.ProcessLogLine(entry.Timestamp, entry.Message, entry.Unit)
 		}
 	}()
-	defer cancel()
 
 	// HTTP server
 	mux := http.NewServeMux()
