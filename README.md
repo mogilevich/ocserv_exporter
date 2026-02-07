@@ -1,6 +1,6 @@
 # ocserv-exporter
 
-Prometheus exporter for OpenConnect VPN Server (ocserv). Reads logs from systemd journal and exports metrics.
+Prometheus exporter for OpenConnect VPN Server (ocserv). Collects metrics from systemd journal logs and occtl status.
 
 ## Features
 
