@@ -233,6 +233,7 @@ func main() {
 
 	log.Printf("Listening on %s", *listenAddress)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		cancel()
 		log.Fatalf("HTTP server error: %v", err)
 	}
 }
