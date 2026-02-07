@@ -1,5 +1,11 @@
 # ocserv-exporter
 
+[![CI](https://github.com/mogilevich/ocserv_exporter/workflows/CI/badge.svg)](https://github.com/mogilevich/ocserv_exporter/actions/workflows/ci.yml)
+[![Release](https://github.com/mogilevich/ocserv_exporter/workflows/Release/badge.svg)](https://github.com/mogilevich/ocserv_exporter/actions/workflows/release.yml)
+[![Docker](https://github.com/mogilevich/ocserv_exporter/workflows/Docker/badge.svg)](https://github.com/mogilevich/ocserv_exporter/actions/workflows/docker.yml)
+[![GitHub release](https://img.shields.io/github/v/release/mogilevich/ocserv_exporter)](https://github.com/mogilevich/ocserv_exporter/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Prometheus exporter for OpenConnect VPN Server (ocserv). Collects metrics from systemd journal logs and occtl status.
 
 ## Features
