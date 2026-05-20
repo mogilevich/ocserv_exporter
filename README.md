@@ -43,8 +43,8 @@ Prometheus exporter for OpenConnect VPN Server (ocserv). Collects metrics from s
 
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
-| `ocserv_server_rx_bytes_total` | Gauge | server | Total bytes received by server (real-time) |
-| `ocserv_server_tx_bytes_total` | Gauge | server | Total bytes sent by server (real-time) |
+| `ocserv_server_rx_bytes` | Gauge | server | Bytes received by server (may reset on `occtl reset stats`) |
+| `ocserv_server_tx_bytes` | Gauge | server | Bytes sent by server (may reset on `occtl reset stats`) |
 | `ocserv_server_active_sessions` | Gauge | server | Active sessions from occtl |
 | `ocserv_server_total_sessions` | Gauge | server | Total sessions since stats reset |
 | `ocserv_server_latency_median_seconds` | Gauge | server | Median server latency |
@@ -53,6 +53,9 @@ Prometheus exporter for OpenConnect VPN Server (ocserv). Collects metrics from s
 | `ocserv_server_avg_session_time_seconds` | Gauge | server | Average session time |
 | `ocserv_sessions_by_client_type` | Gauge | server, client_type | Sessions by VPN client type |
 | `ocserv_user_concurrent_sessions` | Gauge | server, username | Current concurrent sessions per user |
+| `ocserv_session_active_seconds_total` | Counter | server, username, vpn_ip, country, client_type | Cumulative seconds the session was observed active by occtl polling |
+
+> **Breaking change:** `ocserv_server_rx_bytes_total` and `ocserv_server_tx_bytes_total` were renamed to drop the `_total` suffix — they are gauges (the underlying `occtl show status` counter can drop on `occtl reset stats` or process restart), and Prometheus convention reserves `_total` for monotonic counters. Update any saved queries / dashboards that referenced the old names.
 
 ## Installation
 
@@ -208,7 +211,7 @@ sudo -u ocserv-exporter sudo -n occtl show status
 
 ### Note on traffic metrics
 
-Per-user traffic (`ocserv_received_bytes_total`, `ocserv_sent_bytes_total`) is only available at disconnect time - this is a limitation of ocserv logging, not the exporter. The `occtl` integration provides **server-level** traffic in real-time via `ocserv_server_rx_bytes_total` and `ocserv_server_tx_bytes_total`.
+Per-user traffic (`ocserv_received_bytes_total`, `ocserv_sent_bytes_total`) is only available at disconnect time - this is a limitation of ocserv logging, not the exporter. The `occtl` integration provides **server-level** traffic via `ocserv_server_rx_bytes` and `ocserv_server_tx_bytes` (gauges, updated each `--occtl.interval`).
 
 ## Building
 

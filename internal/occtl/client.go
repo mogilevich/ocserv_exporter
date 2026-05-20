@@ -135,8 +135,8 @@ func parseStatus(output string) (*ServerStatus, error) {
 		"authFail":   regexp.MustCompile(`Total authentication failures:\s*(\d+)`),
 		"rx":         regexp.MustCompile(`RX:\s*([\d.]+)\s*(\w+)`),
 		"tx":         regexp.MustCompile(`TX:\s*([\d.]+)\s*(\w+)`),
-		"latencyMed": regexp.MustCompile(`Median latency:\s*<?(\d+)m?s?`),
-		"latencyStd": regexp.MustCompile(`STDEV latency:\s*<?(\d+)m?s?`),
+		"latencyMed": regexp.MustCompile(`Median latency:\s*(.+)`),
+		"latencyStd": regexp.MustCompile(`STDEV latency:\s*(.+)`),
 		"avgSession": regexp.MustCompile(`Average session time:\s*(.+)`),
 		"maxSession": regexp.MustCompile(`Max session time:\s*(.+)`),
 		"uptime":     regexp.MustCompile(`Up since:.+\(\s*(.+?)\s*\)`),
@@ -162,12 +162,10 @@ func parseStatus(output string) (*ServerStatus, error) {
 			status.TxBytes = parseBytes(m[1], m[2])
 		}
 		if m := patterns["latencyMed"].FindStringSubmatch(line); m != nil {
-			val, _ := strconv.ParseFloat(m[1], 64)
-			status.LatencyMedianMs = val
+			status.LatencyMedianMs = parseLatency(m[1])
 		}
 		if m := patterns["latencyStd"].FindStringSubmatch(line); m != nil {
-			val, _ := strconv.ParseFloat(m[1], 64)
-			status.LatencyStdevMs = val
+			status.LatencyStdevMs = parseLatency(m[1])
 		}
 		if m := patterns["avgSession"].FindStringSubmatch(line); m != nil {
 			status.AvgSessionTimeSec = parseDuration(m[1])
@@ -326,44 +324,62 @@ func parseBytes(valueStr, unit string) int64 {
 	}
 }
 
-// parseDuration parses time strings like "3h:54m", "18m:00s", "58s"
+// durationToken matches "<num><unit>" pairs like "22days", "41h", "06m", "00s",
+// "1day", "2 hours", "1 week". Longer units come first so "days" wins over "d".
+var durationToken = regexp.MustCompile(`(?i)(\d+(?:\.\d+)?)\s*(weeks?|days?|hours?|minutes?|seconds?|w|d|h|m|s)\b`)
+
+// parseDuration parses ocserv time strings such as "3h:54m", "18m:00s", "58s",
+// "22days", "7days", "1day:3h", "1 day, 14:23:45". Tokens with no unit are ignored.
 func parseDuration(s string) float64 {
-	s = strings.TrimSpace(s)
+	// Colons and commas are used as token separators in ocserv output; turn them
+	// into whitespace so durationToken can match each "<num><unit>" pair.
+	s = strings.ReplaceAll(s, ":", " ")
+	s = strings.ReplaceAll(s, ",", " ")
 
-	var totalSeconds float64
-
-	// Handle "3h:54m" format
-	if strings.Contains(s, "h") {
-		parts := strings.Split(s, "h")
-		hours, _ := strconv.ParseFloat(strings.TrimSpace(parts[0]), 64)
-		totalSeconds += hours * 3600
-		if len(parts) > 1 {
-			s = strings.TrimPrefix(parts[1], ":")
-		} else {
-			return totalSeconds
+	var total float64
+	for _, m := range durationToken.FindAllStringSubmatch(s, -1) {
+		n, err := strconv.ParseFloat(m[1], 64)
+		if err != nil {
+			continue
+		}
+		switch strings.ToLower(m[2]) {
+		case "w", "week", "weeks":
+			total += n * 7 * 86400
+		case "d", "day", "days":
+			total += n * 86400
+		case "h", "hour", "hours":
+			total += n * 3600
+		case "m", "min", "minute", "minutes":
+			total += n * 60
+		case "s", "sec", "second", "seconds":
+			total += n
 		}
 	}
+	return total
+}
 
-	// Handle minutes
-	if strings.Contains(s, "m") {
-		parts := strings.Split(s, "m")
-		minutes, _ := strconv.ParseFloat(strings.TrimSpace(parts[0]), 64)
-		totalSeconds += minutes * 60
-		if len(parts) > 1 {
-			s = strings.TrimPrefix(parts[1], ":")
-		} else {
-			return totalSeconds
-		}
+// latencyToken matches "<1ms", "1.5ms", "500us", "2s". Unit defaults to ms.
+var latencyToken = regexp.MustCompile(`<?\s*([\d.]+)\s*(ms|s|us|μs)?`)
+
+// parseLatency normalizes an ocserv latency string into milliseconds.
+// occtl can emit "<1ms" (resolution floor), bare numbers, microseconds, or seconds.
+func parseLatency(s string) float64 {
+	m := latencyToken.FindStringSubmatch(strings.TrimSpace(s))
+	if m == nil {
+		return 0
 	}
-
-	// Handle seconds
-	if strings.Contains(s, "s") {
-		secStr := strings.TrimSuffix(s, "s")
-		seconds, _ := strconv.ParseFloat(strings.TrimSpace(secStr), 64)
-		totalSeconds += seconds
+	n, err := strconv.ParseFloat(m[1], 64)
+	if err != nil {
+		return 0
 	}
-
-	return totalSeconds
+	switch strings.ToLower(m[2]) {
+	case "s":
+		return n * 1000
+	case "us", "μs":
+		return n / 1000
+	default:
+		return n
+	}
 }
 
 // GetUserAgentStats returns aggregated user agent statistics

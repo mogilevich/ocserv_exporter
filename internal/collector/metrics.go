@@ -140,22 +140,24 @@ var (
 
 	// Server-level metrics from occtl
 
-	// ServerRxBytesTotal tracks total received bytes at server level (from occtl)
-	ServerRxBytesTotal = prometheus.NewGaugeVec(
+	// ServerRxBytes is the running total of bytes received by the server (Gauge,
+	// not Counter: the underlying occtl value can drop on "occtl reset stats" or
+	// process restart, so the _total suffix would be misleading).
+	ServerRxBytes = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
-			Name:      "server_rx_bytes_total",
-			Help:      "Total bytes received by server (from occtl show status)",
+			Name:      "server_rx_bytes",
+			Help:      "Bytes received by server, as reported by occtl show status (may reset)",
 		},
 		[]string{"server"},
 	)
 
-	// ServerTxBytesTotal tracks total sent bytes at server level (from occtl)
-	ServerTxBytesTotal = prometheus.NewGaugeVec(
+	// ServerTxBytes — see ServerRxBytes.
+	ServerTxBytes = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
-			Name:      "server_tx_bytes_total",
-			Help:      "Total bytes sent by server (from occtl show status)",
+			Name:      "server_tx_bytes",
+			Help:      "Bytes sent by server, as reported by occtl show status (may reset)",
 		},
 		[]string{"server"},
 	)
@@ -239,6 +241,19 @@ var (
 		},
 		[]string{"server", "username"},
 	)
+
+	// SessionActiveSecondsTotal accumulates time each session has been observed
+	// active by occtl polls. Incremented by --occtl.interval on every poll for
+	// each still-active session; series are deleted on disconnect. Labels match
+	// SessionInfo so they can be joined.
+	SessionActiveSecondsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Name:      "session_active_seconds_total",
+			Help:      "Cumulative seconds the session was observed active by occtl polling",
+		},
+		[]string{"server", "username", "vpn_ip", "country", "client_type"},
+	)
 )
 
 // RegisterMetrics registers all metrics with the provided registry
@@ -263,8 +278,8 @@ func RegisterMetrics(reg prometheus.Registerer) {
 // RegisterOcctlMetrics registers occtl-specific metrics
 func RegisterOcctlMetrics(reg prometheus.Registerer) {
 	reg.MustRegister(
-		ServerRxBytesTotal,
-		ServerTxBytesTotal,
+		ServerRxBytes,
+		ServerTxBytes,
 		ServerActiveSessions,
 		ServerTotalSessions,
 		ServerLatencyMedian,
@@ -273,5 +288,6 @@ func RegisterOcctlMetrics(reg prometheus.Registerer) {
 		ServerAvgSessionTime,
 		SessionsByClientType,
 		UserConcurrentSessions,
+		SessionActiveSecondsTotal,
 	)
 }

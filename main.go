@@ -123,15 +123,20 @@ func main() {
 			ticker := time.NewTicker(*occtlInterval)
 			defer ticker.Stop()
 
+			// Tracks active session label sets observed in the previous poll so we
+			// can DeleteLabelValues for sessions that disappeared (counters can't
+			// be reset). Nil on the first iteration; pollOcctl handles that.
+			var prevActive map[string]struct{}
+
 			// Initial poll
-			pollOcctl(clients, coll)
+			prevActive = pollOcctl(clients, coll, *occtlInterval, prevActive)
 
 			for {
 				select {
 				case <-ctx.Done():
 					return
 				case <-ticker.C:
-					pollOcctl(clients, coll)
+					prevActive = pollOcctl(clients, coll, *occtlInterval, prevActive)
 				}
 			}
 		}()
@@ -241,8 +246,10 @@ func main() {
 	}
 }
 
-// pollOcctl fetches metrics from all occtl clients
-func pollOcctl(clients []*occtl.Client, coll *collector.Collector) {
+// pollOcctl fetches metrics from all occtl clients. prevActive is the set of
+// session label-tuples seen on the previous poll; pollOcctl returns the set
+// observed this time so the caller can pass it back on the next tick.
+func pollOcctl(clients []*occtl.Client, coll *collector.Collector, interval time.Duration, prevActive map[string]struct{}) map[string]struct{} {
 	// Collect all stats first, then update metrics atomically
 	allUserAgentStats := make(map[string]map[string]int)
 	allUserSessionCounts := make(map[string]map[string]int)
@@ -260,8 +267,8 @@ func pollOcctl(clients []*occtl.Client, coll *collector.Collector) {
 		}
 
 		// Update server metrics
-		collector.ServerRxBytesTotal.WithLabelValues(serverName).Set(float64(status.RxBytes))
-		collector.ServerTxBytesTotal.WithLabelValues(serverName).Set(float64(status.TxBytes))
+		collector.ServerRxBytes.WithLabelValues(serverName).Set(float64(status.RxBytes))
+		collector.ServerTxBytes.WithLabelValues(serverName).Set(float64(status.TxBytes))
 		collector.ServerActiveSessions.WithLabelValues(serverName).Set(float64(status.ActiveSessions))
 		collector.ServerTotalSessions.WithLabelValues(serverName).Set(float64(status.TotalSessions))
 		collector.ServerLatencyMedian.WithLabelValues(serverName).Set(status.LatencyMedianMs / 1000.0)
@@ -318,8 +325,12 @@ func pollOcctl(clients []*occtl.Client, coll *collector.Collector) {
 		}
 	}
 
-	// Reset and update session info from occtl users (accurate real-time data)
+	// Reset and update session info from occtl users (accurate real-time data).
+	// At the same time, increment the active-seconds counter for each session
+	// observed this poll, and build currentActive for diffing against prevActive.
 	collector.SessionInfo.Reset()
+	currentActive := make(map[string]struct{})
+	intervalSec := interval.Seconds()
 	for serverName, users := range allUsers {
 		clientTypes := allUserClientTypes[serverName]
 		for _, user := range users {
@@ -334,6 +345,38 @@ func pollOcctl(clients []*occtl.Client, coll *collector.Collector) {
 			// Value is session start timestamp (now - since duration)
 			startTime := time.Now().Add(-user.Since)
 			collector.SessionInfo.WithLabelValues(serverName, user.Username, user.VpnIP, country, clientType).Set(float64(startTime.Unix()))
+			collector.SessionActiveSecondsTotal.WithLabelValues(serverName, user.Username, user.VpnIP, country, clientType).Add(intervalSec)
+			currentActive[sessionKey(serverName, user.Username, user.VpnIP, country, clientType)] = struct{}{}
 		}
 	}
+
+	// Remove counter series for sessions that disappeared since the previous
+	// poll. Counters can't be Reset() safely (would break increase()), so we
+	// delete label sets that are no longer active.
+	for key := range prevActive {
+		if _, ok := currentActive[key]; ok {
+			continue
+		}
+		if labels := parseSessionKey(key); labels != nil {
+			collector.SessionActiveSecondsTotal.DeleteLabelValues(labels...)
+		}
+	}
+
+	return currentActive
+}
+
+// sessionKey / parseSessionKey use \x00 as a separator since none of the label
+// values (server, username, vpn_ip, country, client_type) can contain a NUL byte.
+const sessionKeySep = "\x00"
+
+func sessionKey(server, username, vpnIP, country, clientType string) string {
+	return strings.Join([]string{server, username, vpnIP, country, clientType}, sessionKeySep)
+}
+
+func parseSessionKey(key string) []string {
+	parts := strings.Split(key, sessionKeySep)
+	if len(parts) != 5 {
+		return nil
+	}
+	return parts
 }
