@@ -65,18 +65,10 @@
       },
       "id": 20,
       "options": {
-        "displayMode": "lcd",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 10,
-        "minVizWidth": 0,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -84,9 +76,9 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "12.3.0",
       "targets": [
@@ -97,7 +89,7 @@
         }
       ],
       "title": "Server RX Total",
-      "type": "bargauge"
+      "type": "stat"
     },
     {
       "datasource": {
@@ -131,18 +123,10 @@
       },
       "id": 21,
       "options": {
-        "displayMode": "lcd",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 10,
-        "minVizWidth": 0,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -150,9 +134,9 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "12.3.0",
       "targets": [
@@ -163,7 +147,7 @@
         }
       ],
       "title": "Server TX Total",
-      "type": "bargauge"
+      "type": "stat"
     },
     {
       "datasource": {
@@ -310,6 +294,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Average session time from \"occtl show status\" current stats period (resets independently via \"occtl reset stats\"). Not the overall lifetime average.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -650,7 +635,9 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull"
+            "lastNotNull",
+            "mean",
+            "max"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -893,6 +880,54 @@
                 "value": "dateTimeFromNow"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "vpn_ip"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "client_type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Connected since"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 110
+              }
+            ]
           }
         ]
       },
@@ -941,6 +976,9 @@
               "server": 0,
               "username": 1,
               "vpn_ip": 3
+            },
+            "renameByName": {
+              "Value": "Connected since"
             }
           }
         }
@@ -1071,7 +1109,7 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 3,
+        "w": 4,
         "x": 15,
         "y": 22
       },
@@ -1096,7 +1134,7 @@
           "refId": "A"
         }
       ],
-      "title": "Active Sessions by Country",
+      "title": "Sessions by Country (Active)",
       "transformations": [
         {
           "id": "organize",
@@ -1156,8 +1194,8 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 6,
-        "x": 18,
+        "w": 5,
+        "x": 19,
         "y": 22
       },
       "id": 15,
@@ -1957,7 +1995,7 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom",
+          "placement": "right",
           "showLegend": true
         },
         "tooltip": {
@@ -2041,7 +2079,7 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom",
+          "placement": "right",
           "showLegend": true
         },
         "tooltip": {
@@ -2440,7 +2478,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 150
+                "value": 100
               }
             ]
           },
@@ -2452,7 +2490,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 110
+                "value": 90
               }
             ]
           }
