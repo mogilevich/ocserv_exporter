@@ -3170,8 +3170,9 @@
     "list": [
       {
         "current": {
-          "text": "",
-          "value": ""
+          "selected": true,
+          "text": "default",
+          "value": "default"
         },
         "includeAll": false,
         "label": "Datasource",
