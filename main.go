@@ -33,7 +33,7 @@ func main() {
 				Default("/metrics").String()
 		journalUnits = kingpin.Flag("journal.unit", "Systemd unit name to read logs from (can be specified multiple times).").
 				Default("ocserv").Strings()
-		journalSince = kingpin.Flag("journal.since", "How far back to read logs on startup.").
+		journalSince = kingpin.Flag("journal.since", "How far back to replay logs on startup to rebuild sessions (counters count only events after startup).").
 				Default("1h").Duration()
 		logFile = kingpin.Flag("log.file", "Read logs from file instead of journald (for testing).").
 			String()
@@ -159,12 +159,15 @@ func main() {
 				cancel()
 				log.Fatal("journald is only available on Linux. Use --log.file to read from a file instead.")
 			}
+			start := time.Now()
 			reader, err = journal.NewJournalReader(*journalUnits, *journalSince)
 			if err != nil {
 				cancel()
 				log.Fatalf("Failed to open journal: %v", err)
 			}
-			log.Printf("Reading logs from journald units: %v (since %s)", *journalUnits, *journalSince)
+			// replayed history rebuilds sessions but must not inflate counters on every restart
+			coll.SetCountFrom(start)
+			log.Printf("Reading logs from journald units: %v (since %s, counting from start)", *journalUnits, *journalSince)
 		}
 		defer func() {
 			if err := reader.Close(); err != nil {

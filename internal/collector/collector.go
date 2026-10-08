@@ -62,6 +62,9 @@ type Collector struct {
 	workerContext   map[string]*WorkerContext    // key: "server:username:clientIP" -> worker context
 	parser          *parser.Parser
 	geoIP           GeoIPResolver
+	// countFrom: earlier events (journal replay on startup) rebuild session
+	// state only, counters skip them. Zero value counts everything.
+	countFrom time.Time
 }
 
 // New creates a new Collector
@@ -72,6 +75,18 @@ func New() *Collector {
 		workerContext:   make(map[string]*WorkerContext),
 		parser:          parser.New(),
 	}
+}
+
+// SetCountFrom makes counters ignore events older than t. Set once, before
+// events are processed: the journal is replayed on startup to rebuild
+// sessions, and replayed events must not be counted again.
+func (c *Collector) SetCountFrom(t time.Time) {
+	c.countFrom = t
+}
+
+// counts reports whether the event should increment counters.
+func (c *Collector) counts(event *parser.Event) bool {
+	return !event.Timestamp.Before(c.countFrom)
 }
 
 // SetGeoIPResolver sets the GeoIP resolver
@@ -130,7 +145,7 @@ func (c *Collector) handleLogin(event *parser.Event) {
 
 	// Check for reconnect (login within ReconnectWindow of last disconnect)
 	if lastDisconnect, ok := c.lastDisconnects[userKey]; ok {
-		if event.Timestamp.Sub(lastDisconnect.Timestamp) < ReconnectWindow {
+		if event.Timestamp.Sub(lastDisconnect.Timestamp) < ReconnectWindow && c.counts(event) {
 			ReconnectsTotal.WithLabelValues(event.Server, event.Username).Inc()
 		}
 	}
@@ -156,6 +171,9 @@ func (c *Collector) handleLogin(event *parser.Event) {
 
 	// Update metrics
 	ActiveSessions.WithLabelValues(event.Server, event.Username).Inc()
+	if !c.counts(event) {
+		return
+	}
 	ConnectionsTotal.WithLabelValues(event.Server, event.Username, event.ClientIP).Inc()
 
 	// ConnectionsByCountry (uses countryCode too)
@@ -182,7 +200,7 @@ func (c *Collector) handleDisconnect(event *parser.Event) {
 		vpnIP = session.VpnIP
 		country = session.Country
 		duration = event.Timestamp.Sub(session.StartTime).Seconds()
-		if duration > 0 {
+		if duration > 0 && c.counts(event) {
 			SessionDuration.WithLabelValues(event.Server, event.Username).Observe(duration)
 		}
 		// Remove session info metric
@@ -196,7 +214,7 @@ func (c *Collector) handleDisconnect(event *parser.Event) {
 	// Track problematic sessions (short duration + actual error reason)
 	// "client bye", "user disconnected", and "mobile sleep" are not errors - expected behavior
 	isProblematicReason := reason != "user disconnected" && reason != "client bye" && reason != "mobile sleep" && reason != ""
-	if sessionExists && duration < ProblematicSessionThreshold && duration > 0 && isProblematicReason {
+	if c.counts(event) && sessionExists && duration < ProblematicSessionThreshold && duration > 0 && isProblematicReason {
 		ProblematicSessionsTotal.WithLabelValues(event.Server, event.Username, reason).Inc()
 	}
 
@@ -210,9 +228,11 @@ func (c *Collector) handleDisconnect(event *parser.Event) {
 	if sessionExists {
 		ActiveSessions.WithLabelValues(event.Server, event.Username).Dec()
 	}
-	DisconnectionsTotal.WithLabelValues(event.Server, event.Username, reason).Inc()
-	ReceivedBytesTotal.WithLabelValues(event.Server, event.Username).Add(float64(event.RxBytes))
-	SentBytesTotal.WithLabelValues(event.Server, event.Username).Add(float64(event.TxBytes))
+	if c.counts(event) {
+		DisconnectionsTotal.WithLabelValues(event.Server, event.Username, reason).Inc()
+		ReceivedBytesTotal.WithLabelValues(event.Server, event.Username).Add(float64(event.RxBytes))
+		SentBytesTotal.WithLabelValues(event.Server, event.Username).Add(float64(event.TxBytes))
+	}
 
 	// Clean up worker context after disconnect
 	delete(c.workerContext, ctxKey)
@@ -283,6 +303,9 @@ func (c *Collector) handleVPNIP(event *parser.Event) {
 }
 
 func (c *Collector) handleAuthFailed(event *parser.Event) {
+	if !c.counts(event) {
+		return
+	}
 	country := "Unknown"
 	countryCode := ""
 	if c.geoIP != nil {

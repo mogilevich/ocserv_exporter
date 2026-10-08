@@ -95,7 +95,8 @@ sudo systemctl enable --now ocserv-exporter
 --web.listen-address=":9617"    HTTP endpoint (default: :9617)
 --web.telemetry-path="/metrics" Metrics path (default: /metrics)
 --journal.unit="ocserv"         systemd unit to read (can be repeated)
---journal.since="24h"           Initial lookback period (default: 24h)
+--journal.since="1h"            Lookback replayed on startup to rebuild sessions;
+                                counters count only events after startup (default: 1h)
 --geoip.db=""                   Path to GeoLite2-Country.mmdb (optional)
 --log.file=""                   Read from file instead of journald (for testing)
 --occtl.enabled                 Enable occtl polling for real-time server stats
