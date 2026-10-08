@@ -255,7 +255,7 @@ func parseSessions(output string) ([]Session, error) {
 // parseUsers parses output of "occtl show users"
 // Format:       id     user    vhost             ip         vpn-ip device   since    dtls-cipher    status
 //
-//	3800826 a.zakiev  default   172.30.30.30    10.88.18.67 ocserv-ru3    35s      (no-dtls) connected
+//	3800826 j.roe     default   203.0.113.30     10.0.18.67 ocserv-ru3    35s      (no-dtls) connected
 func parseUsers(output string) ([]User, error) {
 	var users []User
 

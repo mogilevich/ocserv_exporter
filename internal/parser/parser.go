@@ -56,35 +56,35 @@ type Parser struct {
 // New creates a new Parser
 func New() *Parser {
 	return &Parser{
-		// main[a.mogilevich]:62.4.32.53:30595 user logged in
+		// main[j.doe]:203.0.113.53:30595 user logged in
 		reLogin: regexp.MustCompile(`main\[([^\]]+)\]:([^:]+):(\d+) user logged in`),
 
-		// main[a.mogilevich]:62.4.32.53:30595 user disconnected (reason: user disconnected, rx: 13295, tx: 24650)
+		// main[j.doe]:203.0.113.53:30595 user disconnected (reason: user disconnected, rx: 13295, tx: 24650)
 		reDisconnect: regexp.MustCompile(`main\[([^\]]+)\]:([^:]+):(\d+) user disconnected \(reason: ([^,]+), rx: (\d+), tx: (\d+)\)`),
 
-		// sec-mod: initiating session for user 'a.mogilevich' (session: yKsy7b)
+		// sec-mod: initiating session for user 'j.doe' (session: yKsy7b)
 		reSessionStart: regexp.MustCompile(`sec-mod: initiating session for user '([^']+)' \(session: ([^)]+)\)`),
 
-		// sec-mod: invalidating session of user 'a.mogilevich' (session: yKsy7b)
+		// sec-mod: invalidating session of user 'j.doe' (session: yKsy7b)
 		reSessionInvalidate: regexp.MustCompile(`sec-mod: invalidating session of user '([^']+)' \(session: ([^)]+)\)`),
 
-		// worker[a.mogilevich]: 62.4.32.53 sending IPv4 10.88.9.156
+		// worker[j.doe]: 203.0.113.53 sending IPv4 10.0.9.156
 		reVPNIP: regexp.MustCompile(`worker\[([^\]]+)\]: [^ ]+ sending IPv4 ([0-9.]+)`),
 
-		// main:172.30.30.30:56078 failed authentication attempt for user ''
+		// main:203.0.113.30:56078 failed authentication attempt for user ''
 		// main[username]:ip:port failed authentication attempt for user 'username'
 		reAuthFailed: regexp.MustCompile(`main(?:\[([^\]]*)\])?:([^:]+):(\d+) failed authentication attempt`),
 
-		// worker: 172.30.30.30 failed cookie authentication attempt
+		// worker: 203.0.113.30 failed cookie authentication attempt
 		reCookieAuthFailed: regexp.MustCompile(`worker(?:\[([^\]]*)\])?: ([^ ]+) failed cookie authentication attempt`),
 
-		// worker[username]: 172.30.30.30 received BYE packet; exiting
+		// worker[username]: 203.0.113.30 received BYE packet; exiting
 		reByePacket: regexp.MustCompile(`worker\[([^\]]+)\]: ([^ ]+) received BYE packet`),
 
-		// worker[username]: 172.30.30.30 have not received TCP DPD for long (137 secs)
+		// worker[username]: 203.0.113.30 have not received TCP DPD for long (137 secs)
 		reDPDWarning: regexp.MustCompile(`worker\[([^\]]+)\]: ([^ ]+) have not received TCP DPD for long \((\d+) secs\)`),
 
-		// sec-mod: temporarily closing session for a.mogilevich (session: u7N/JC)
+		// sec-mod: temporarily closing session for j.doe (session: u7N/JC)
 		reSecModClose: regexp.MustCompile(`sec-mod: temporarily closing session for ([^ ]+) \(session: ([^)]+)\)`),
 	}
 }
