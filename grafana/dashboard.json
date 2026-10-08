@@ -66,7 +66,7 @@
       "id": 20,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
@@ -124,7 +124,7 @@
       "id": 21,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
@@ -444,8 +444,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 6,
+        "h": 8,
+        "w": 4,
         "x": 0,
         "y": 6
       },
@@ -465,7 +465,10 @@
         },
         "showPercentChange": false,
         "textMode": "auto",
-        "wideLayout": true
+        "wideLayout": true,
+        "text": {
+          "valueSize": 64
+        }
       },
       "pluginVersion": "12.3.0",
       "targets": [
@@ -538,8 +541,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 18,
-        "x": 6,
+        "w": 20,
+        "x": 4,
         "y": 6
       },
       "id": 7,
@@ -623,11 +626,24 @@
           },
           "unit": "Bps"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".* RX$"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
+        "h": 9,
+        "w": 12,
         "x": 0,
         "y": 14
       },
@@ -635,12 +651,11 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
             "mean",
             "max"
           ],
-          "displayMode": "list",
-          "placement": "bottom",
+          "displayMode": "table",
+          "placement": "right",
           "showLegend": true
         },
         "tooltip": {
@@ -662,8 +677,71 @@
           "refId": "B"
         }
       ],
-      "title": "Server Traffic (Real-time)",
+      "title": "Server Traffic (TX ↑ / RX ↓)",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 12,
+        "y": 14
+      },
+      "id": 27,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "expr": "topk(7, sum by (client_type) (ocserv_sessions_by_client_type{server=~\"$server\"}))",
+          "legendFormat": "{{ client_type }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Sessions by VPN Client Type",
+      "type": "piechart"
     },
     {
       "datasource": {
@@ -721,25 +799,12 @@
           },
           "unit": "s"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*stdev$"
-            },
-            "properties": [
-              {
-                "id": "custom.axisPlacement",
-                "value": "right"
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
+        "h": 9,
+        "w": 6,
+        "x": 18,
         "y": 14
       },
       "id": 28,
@@ -762,78 +827,10 @@
           "expr": "ocserv_server_latency_median_seconds{server=~\"$server\"}",
           "legendFormat": "{{ server }} median",
           "refId": "A"
-        },
-        {
-          "expr": "ocserv_server_latency_stdev_seconds{server=~\"$server\"}",
-          "legendFormat": "{{ server }} stdev",
-          "refId": "B"
         }
       ],
-      "title": "Server Latency",
+      "title": "Server Latency (median)",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 14
-      },
-      "id": 27,
-      "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.3.0",
-      "targets": [
-        {
-          "expr": "topk(7, sum by (client_type) (ocserv_sessions_by_client_type{server=~\"$server\"}))",
-          "legendFormat": "{{ client_type }}",
-          "refId": "A"
-        }
-      ],
-      "title": "Sessions by VPN Client Type",
-      "type": "piechart"
     },
     {
       "datasource": {
@@ -889,7 +886,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 70
+                "value": 100
               }
             ]
           },
@@ -897,18 +894,6 @@
             "matcher": {
               "id": "byName",
               "options": "vpn_ip"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 95
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "client_type"
             },
             "properties": [
               {
@@ -925,7 +910,43 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 110
+                "value": 170
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 170
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "device"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "country"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 140
               }
             ]
           }
@@ -933,9 +954,9 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 10,
+        "w": 24,
         "x": 0,
-        "y": 22
+        "y": 23
       },
       "id": 30,
       "options": {
@@ -970,12 +991,13 @@
               "job": true
             },
             "indexByName": {
-              "Value": 5,
-              "client_type": 4,
-              "country": 2,
               "server": 0,
               "username": 1,
-              "vpn_ip": 3
+              "device": 2,
+              "vpn_ip": 3,
+              "country": 4,
+              "client_type": 5,
+              "Connected since": 6
             },
             "renameByName": {
               "Value": "Connected since"
@@ -1017,13 +1039,26 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 10,
-        "w": 5,
-        "x": 10,
-        "y": 22
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 33
       },
       "id": 29,
       "options": {
@@ -1108,10 +1143,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 4,
-        "x": 15,
-        "y": 22
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 33
       },
       "id": 34,
       "options": {
@@ -1193,10 +1228,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 5,
-        "x": 19,
-        "y": 22
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 33
       },
       "id": 15,
       "options": {
@@ -1307,10 +1342,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 0,
-        "y": 32
+        "y": 41
       },
       "id": 31,
       "options": {
@@ -1425,10 +1460,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 8,
-        "y": 32
+        "y": 41
       },
       "id": 32,
       "options": {
@@ -1531,10 +1566,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 16,
-        "y": 32
+        "y": 41
       },
       "id": 35,
       "options": {
@@ -1605,7 +1640,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 50
       },
       "id": 102,
       "panels": [],
@@ -1672,10 +1707,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 16,
+        "h": 10,
+        "w": 15,
         "x": 0,
-        "y": 41
+        "y": 51
       },
       "id": 37,
       "options": {
@@ -1689,7 +1724,8 @@
           "placement": "right",
           "showLegend": true,
           "sortBy": "Max",
-          "sortDesc": true
+          "sortDesc": true,
+          "width": 480
         },
         "tooltip": {
           "hideZeros": true,
@@ -1746,7 +1782,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 150
+                "value": 170
               }
             ]
           },
@@ -1761,14 +1797,26 @@
                 "value": 100
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "device"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 9,
-        "w": 8,
-        "x": 16,
-        "y": 41
+        "h": 10,
+        "w": 9,
+        "x": 15,
+        "y": 51
       },
       "id": 38,
       "options": {
@@ -1808,6 +1856,12 @@
             },
             "renameByName": {
               "Value": "Now"
+            },
+            "indexByName": {
+              "username": 0,
+              "device": 1,
+              "server": 2,
+              "Now": 3
             }
           }
         }
@@ -1820,7 +1874,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 61
       },
       "id": 101,
       "panels": [],
@@ -1859,7 +1913,7 @@
         "h": 5,
         "w": 6,
         "x": 0,
-        "y": 51
+        "y": 62
       },
       "id": 3,
       "options": {
@@ -1918,7 +1972,7 @@
         "h": 5,
         "w": 6,
         "x": 6,
-        "y": 51
+        "y": 62
       },
       "id": 4,
       "options": {
@@ -1969,7 +2023,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 51
+        "y": 62
       },
       "id": 5,
       "options": {
@@ -2028,7 +2082,7 @@
         "h": 5,
         "w": 6,
         "x": 18,
-        "y": 51
+        "y": 62
       },
       "id": 6,
       "options": {
@@ -2112,9 +2166,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 12,
         "x": 0,
-        "y": 56
+        "y": 67
       },
       "id": 8,
       "options": {
@@ -2161,8 +2215,8 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -2195,91 +2249,7 @@
               }
             ]
           },
-          "unit": "Bps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 64
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "expr": "topk(10, sum by (username) (rate(ocserv_received_bytes_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))",
-          "legendFormat": "{{ username }} RX",
-          "refId": "A"
-        }
-      ],
-      "title": "Traffic Received by User",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          },
-          "unit": "Bps"
+          "unit": "decbytes"
         },
         "overrides": []
       },
@@ -2287,15 +2257,19 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 64
+        "y": 67
       },
-      "id": 10,
+      "id": 9,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Total",
+          "sortDesc": true
         },
         "tooltip": {
           "mode": "single",
@@ -2304,13 +2278,15 @@
       },
       "targets": [
         {
-          "expr": "topk(10, sum by (username) (rate(ocserv_sent_bytes_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))",
-          "legendFormat": "{{ username }} TX",
+          "expr": "sum by (username) (increase(ocserv_received_bytes_total{server=~\"$server\",username=~\"$username\"}[$__interval]) + increase(ocserv_sent_bytes_total{server=~\"$server\",username=~\"$username\"}[$__interval])) and on (username) topk(10, sum by (username) (increase(ocserv_received_bytes_total{server=~\"$server\",username=~\"$username\"}[$__range]) + increase(ocserv_sent_bytes_total{server=~\"$server\",username=~\"$username\"}[$__range])))",
+          "legendFormat": "{{ username }}",
           "refId": "A"
         }
       ],
-      "title": "Traffic Sent by User",
-      "type": "timeseries"
+      "title": "Traffic by User (finished sessions)",
+      "type": "timeseries",
+      "description": "Bytes of sessions that ended in each interval: ocserv logs per-user traffic only at disconnect. Top 10 users over the range. For current traffic see Live Traffic by User.",
+      "interval": "5m"
     },
     {
       "datasource": {
@@ -2335,10 +2311,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 0,
-        "y": 72
+        "y": 75
       },
       "id": 11,
       "options": {
@@ -2429,10 +2405,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 8,
-        "y": 72
+        "y": 75
       },
       "id": 13,
       "options": {
@@ -2514,13 +2490,62 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Problematic"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reason"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 16,
-        "y": 72
+        "y": 75
       },
       "id": 14,
       "options": {
@@ -2628,18 +2653,22 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 0,
-        "y": 80
+        "y": 84
       },
       "id": 19,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Total",
+          "sortDesc": true
         },
         "tooltip": {
           "mode": "single",
@@ -2648,7 +2677,7 @@
       },
       "targets": [
         {
-          "expr": "round(sum by (country) (increase(ocserv_connections_by_country_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval])))",
+          "expr": "round(sum by (country) (increase(ocserv_connections_by_country_total{server=~\"$server\",username=~\"$username\"}[$__rate_interval]))) and on (country) topk(7, sum by (country) (increase(ocserv_connections_by_country_total{server=~\"$server\",username=~\"$username\"}[$__range])))",
           "legendFormat": "{{ country }}",
           "refId": "A"
         }
@@ -2693,7 +2722,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 100
+                "value": 140
               }
             ]
           },
@@ -2705,17 +2734,29 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 90
+                "value": 110
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 8,
-        "y": 80
+        "y": 84
       },
       "id": 18,
       "options": {
@@ -2790,10 +2831,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 16,
-        "y": 80
+        "y": 84
       },
       "id": 12,
       "options": {
@@ -2825,7 +2866,7 @@
           "refId": "A"
         }
       ],
-      "title": "Connections by Country",
+      "title": "Connections by Country (Share)",
       "type": "piechart"
     },
     {
@@ -2864,13 +2905,62 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "client_ip"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "country"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 110
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 0,
-        "y": 88
+        "y": 93
       },
       "id": 17,
       "options": {
@@ -2946,10 +3036,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 8,
-        "y": 88
+        "y": 93
       },
       "id": 33,
       "options": {
@@ -3040,10 +3130,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 8,
         "x": 16,
-        "y": 88
+        "y": 93
       },
       "id": 16,
       "options": {
