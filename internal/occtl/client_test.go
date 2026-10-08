@@ -125,3 +125,34 @@ func TestParseLatency(t *testing.T) {
 		}
 	}
 }
+
+// usersOutput mimics `occtl show users` (ocserv 1.3.0) column layout; names and
+// addresses are fictional. device is what the dashboard joins node_exporter on.
+const usersOutput = `      id     user    vhost             ip         vpn-ip device   since    dtls-cipher    status
+ 2234286    alice  default   203.0.113.71     10.0.0.71 ocserv-ru8     8s  (AES-256-GCM) connected
+ 2234259      bob  default      127.0.0.1     10.0.0.55 ocserv-ru20    23s      (no-dtls) connected
+ 2233074    carol  default      127.0.0.1    10.0.1.175 vpns0 13m:04s      (no-dtls) connected
+`
+
+func TestParseUsers(t *testing.T) {
+	users, err := parseUsers(usersOutput)
+	if err != nil {
+		t.Fatalf("parseUsers: %v", err)
+	}
+	want := []struct {
+		username, clientIP, vpnIP, device string
+	}{
+		{"alice", "203.0.113.71", "10.0.0.71", "ocserv-ru8"},
+		{"bob", "127.0.0.1", "10.0.0.55", "ocserv-ru20"},
+		{"carol", "127.0.0.1", "10.0.1.175", "vpns0"},
+	}
+	if len(users) != len(want) {
+		t.Fatalf("got %d users, want %d", len(users), len(want))
+	}
+	for i, w := range want {
+		u := users[i]
+		if u.Username != w.username || u.ClientIP != w.clientIP || u.VpnIP != w.vpnIP || u.Device != w.device {
+			t.Errorf("user %d = {%s %s %s %s}, want %+v", i, u.Username, u.ClientIP, u.VpnIP, u.Device, w)
+		}
+	}
+}

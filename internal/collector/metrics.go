@@ -128,14 +128,16 @@ var (
 	)
 
 	// SessionInfo provides detailed info about each active session
-	// Value is session start timestamp (unix), labels provide session details
+	// Value is session start timestamp (unix), labels provide session details.
+	// device is the session's tun interface: join with node_exporter
+	// node_network_*_bytes_total on(device) for live per-user traffic.
 	SessionInfo = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "session_info",
 			Help:      "Information about active sessions (value is session start timestamp)",
 		},
-		[]string{"server", "username", "vpn_ip", "country", "client_type"},
+		[]string{"server", "username", "vpn_ip", "device", "country", "client_type"},
 	)
 
 	// Server-level metrics from occtl
@@ -252,7 +254,7 @@ var (
 			Name:      "session_active_seconds_total",
 			Help:      "Cumulative seconds the session was observed active by occtl polling",
 		},
-		[]string{"server", "username", "vpn_ip", "country", "client_type"},
+		[]string{"server", "username", "vpn_ip", "device", "country", "client_type"},
 	)
 )
 

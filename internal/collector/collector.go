@@ -152,7 +152,7 @@ func (c *Collector) handleLogin(event *parser.Event) {
 	}
 
 	// Set session info metric (VPN IP will be updated later when assigned)
-	SessionInfo.WithLabelValues(event.Server, event.Username, "", country, "").Set(float64(event.Timestamp.Unix()))
+	SessionInfo.WithLabelValues(event.Server, event.Username, "", "", country, "").Set(float64(event.Timestamp.Unix()))
 
 	// Update metrics
 	ActiveSessions.WithLabelValues(event.Server, event.Username).Inc()
@@ -186,7 +186,7 @@ func (c *Collector) handleDisconnect(event *parser.Event) {
 			SessionDuration.WithLabelValues(event.Server, event.Username).Observe(duration)
 		}
 		// Remove session info metric
-		SessionInfo.DeleteLabelValues(event.Server, event.Username, vpnIP, country, "")
+		SessionInfo.DeleteLabelValues(event.Server, event.Username, vpnIP, "", country, "")
 		delete(c.sessions, key)
 	}
 
@@ -274,9 +274,9 @@ func (c *Collector) handleVPNIP(event *parser.Event) {
 	for _, session := range c.sessions {
 		if session.Username == event.Username && session.Server == event.Server && session.VpnIP == "" {
 			// Delete old metric (without VPN IP) and set new one (with VPN IP)
-			SessionInfo.DeleteLabelValues(session.Server, session.Username, "", session.Country, "")
+			SessionInfo.DeleteLabelValues(session.Server, session.Username, "", "", session.Country, "")
 			session.VpnIP = event.VpnIP
-			SessionInfo.WithLabelValues(session.Server, session.Username, session.VpnIP, session.Country, "").Set(float64(session.StartTime.Unix()))
+			SessionInfo.WithLabelValues(session.Server, session.Username, session.VpnIP, "", session.Country, "").Set(float64(session.StartTime.Unix()))
 			break
 		}
 	}
@@ -403,7 +403,7 @@ func (c *Collector) CleanupOldDisconnects() {
 		}
 		if now.Sub(session.StartTime) > MaxSessionAge {
 			// Remove stale session info metric
-			SessionInfo.DeleteLabelValues(session.Server, session.Username, session.VpnIP, session.Country, "")
+			SessionInfo.DeleteLabelValues(session.Server, session.Username, session.VpnIP, "", session.Country, "")
 			ActiveSessions.WithLabelValues(session.Server, session.Username).Dec()
 			delete(c.sessions, key)
 		}

@@ -344,9 +344,9 @@ func pollOcctl(clients []*occtl.Client, coll *collector.Collector, interval time
 			}
 			// Value is session start timestamp (now - since duration)
 			startTime := time.Now().Add(-user.Since)
-			collector.SessionInfo.WithLabelValues(serverName, user.Username, user.VpnIP, country, clientType).Set(float64(startTime.Unix()))
-			collector.SessionActiveSecondsTotal.WithLabelValues(serverName, user.Username, user.VpnIP, country, clientType).Add(intervalSec)
-			currentActive[sessionKey(serverName, user.Username, user.VpnIP, country, clientType)] = struct{}{}
+			collector.SessionInfo.WithLabelValues(serverName, user.Username, user.VpnIP, user.Device, country, clientType).Set(float64(startTime.Unix()))
+			collector.SessionActiveSecondsTotal.WithLabelValues(serverName, user.Username, user.VpnIP, user.Device, country, clientType).Add(intervalSec)
+			currentActive[sessionKey(serverName, user.Username, user.VpnIP, user.Device, country, clientType)] = struct{}{}
 		}
 	}
 
@@ -366,16 +366,16 @@ func pollOcctl(clients []*occtl.Client, coll *collector.Collector, interval time
 }
 
 // sessionKey / parseSessionKey use \x00 as a separator since none of the label
-// values (server, username, vpn_ip, country, client_type) can contain a NUL byte.
+// values (server, username, vpn_ip, device, country, client_type) can contain a NUL byte.
 const sessionKeySep = "\x00"
 
-func sessionKey(server, username, vpnIP, country, clientType string) string {
-	return strings.Join([]string{server, username, vpnIP, country, clientType}, sessionKeySep)
+func sessionKey(server, username, vpnIP, device, country, clientType string) string {
+	return strings.Join([]string{server, username, vpnIP, device, country, clientType}, sessionKeySep)
 }
 
 func parseSessionKey(key string) []string {
 	parts := strings.Split(key, sessionKeySep)
-	if len(parts) != 5 {
+	if len(parts) != 6 {
 		return nil
 	}
 	return parts

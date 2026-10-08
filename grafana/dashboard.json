@@ -1451,7 +1451,7 @@
       },
       "targets": [
         {
-          "expr": "(max by (server, username) (max_over_time(timestamp(ocserv_session_info{server=~\"$server\",username=~\"$username\"})[$__range:1m])) unless ocserv_session_info{server=~\"$server\",username=~\"$username\"}) * 1000",
+          "expr": "(max by (server, username) (max_over_time(timestamp(ocserv_session_info{server=~\"$server\",username=~\"$username\"})[$__range:1m])) unless on (server, username) ocserv_session_info{server=~\"$server\",username=~\"$username\"}) * 1000",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1607,6 +1607,221 @@
         "x": 0,
         "y": 40
       },
+      "id": 102,
+      "panels": [],
+      "title": "Live Traffic by User (node_exporter × occtl)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Per-user throughput: node_exporter counters of each session's tun interface joined on(device) with ocserv_session_info. Unlike the journal panels below, it does not wait for disconnect.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 0,
+        "y": 41
+      },
+      "id": 37,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": true,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "expr": "topk(10, sum by (server, username) ((rate(node_network_receive_bytes_total{instance=\"$node\"}[$__rate_interval]) + rate(node_network_transmit_bytes_total{instance=\"$node\"}[$__rate_interval])) * 8 * on (device) group_left (server, username) group by (device, server, username) (topk by (device) (1, ocserv_session_info{server=~\"$server\",username=~\"$username\",device!=\"\"}))))",
+          "legendFormat": "{{ username }} ({{ server }})",
+          "refId": "A"
+        }
+      ],
+      "title": "Traffic by User (Live)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Current per-user throughput, rx+tx of the session's tun interface. device is the interface name on the VPN host.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 41
+      },
+      "id": 38,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Now"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "topk(20, sum by (server, username, device) ((rate(node_network_receive_bytes_total{instance=\"$node\"}[$__rate_interval]) + rate(node_network_transmit_bytes_total{instance=\"$node\"}[$__rate_interval])) * 8 * on (device) group_left (server, username) group by (device, server, username) (topk by (device) (1, ocserv_session_info{server=~\"$server\",username=~\"$username\",device!=\"\"}))))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Users Now",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Now"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
       "id": 101,
       "panels": [],
       "title": "User Statistics (journal)",
@@ -1644,7 +1859,7 @@
         "h": 5,
         "w": 6,
         "x": 0,
-        "y": 41
+        "y": 51
       },
       "id": 3,
       "options": {
@@ -1703,7 +1918,7 @@
         "h": 5,
         "w": 6,
         "x": 6,
-        "y": 41
+        "y": 51
       },
       "id": 4,
       "options": {
@@ -1754,7 +1969,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 41
+        "y": 51
       },
       "id": 5,
       "options": {
@@ -1813,7 +2028,7 @@
         "h": 5,
         "w": 6,
         "x": 18,
-        "y": 41
+        "y": 51
       },
       "id": 6,
       "options": {
@@ -1899,7 +2114,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 46
+        "y": 56
       },
       "id": 8,
       "options": {
@@ -1988,7 +2203,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 54
+        "y": 64
       },
       "id": 9,
       "options": {
@@ -2072,7 +2287,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 54
+        "y": 64
       },
       "id": 10,
       "options": {
@@ -2123,7 +2338,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 62
+        "y": 72
       },
       "id": 11,
       "options": {
@@ -2217,7 +2432,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 62
+        "y": 72
       },
       "id": 13,
       "options": {
@@ -2305,7 +2520,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 62
+        "y": 72
       },
       "id": 14,
       "options": {
@@ -2416,7 +2631,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 70
+        "y": 80
       },
       "id": 19,
       "options": {
@@ -2500,7 +2715,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 70
+        "y": 80
       },
       "id": 18,
       "options": {
@@ -2578,7 +2793,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 70
+        "y": 80
       },
       "id": 12,
       "options": {
@@ -2655,7 +2870,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 78
+        "y": 88
       },
       "id": 17,
       "options": {
@@ -2734,7 +2949,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 78
+        "y": 88
       },
       "id": 33,
       "options": {
@@ -2828,7 +3043,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 78
+        "y": 88
       },
       "id": 16,
       "options": {
@@ -2920,6 +3135,31 @@
         "options": [],
         "query": {
           "query": "label_values(ocserv_active_sessions{server=~\"$server\"}, username)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(node_network_receive_bytes_total{device=~\"vpns.*|ocserv.*\"}, instance)",
+        "description": "node_exporter on the ocserv host: its per-interface counters give live per-user traffic",
+        "includeAll": false,
+        "label": "node_exporter (VPN host)",
+        "multi": false,
+        "name": "node",
+        "options": [],
+        "query": {
+          "query": "label_values(node_network_receive_bytes_total{device=~\"vpns.*|ocserv.*\"}, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,

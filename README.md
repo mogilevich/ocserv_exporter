@@ -33,7 +33,7 @@ Prometheus exporter for OpenConnect VPN Server (ocserv). Collects metrics from s
 | `ocserv_session_duration_seconds` | Histogram | server, username | Session duration distribution |
 | `ocserv_reconnects_total` | Counter | server, username | Rapid reconnections (< 5 min) |
 | `ocserv_problematic_sessions_total` | Counter | server, username, reason | Short sessions with errors |
-| `ocserv_session_info` | Gauge | server, username, vpn_ip, country, client_type | Active session details (value is start timestamp) |
+| `ocserv_session_info` | Gauge | server, username, vpn_ip, device, country, client_type | Active session details (value is start timestamp) |
 | `ocserv_auth_failed_total` | Counter | server, username, client_ip, country, country_code | Failed authentication attempts |
 | `ocserv_connections_by_country_total` | Counter | server, username, country, country_code | Connections by country (GeoIP) |
 | `ocserv_last_event_timestamp_seconds` | Gauge | - | Last processed log event timestamp |
@@ -53,7 +53,7 @@ Prometheus exporter for OpenConnect VPN Server (ocserv). Collects metrics from s
 | `ocserv_server_avg_session_time_seconds` | Gauge | server | Average session time |
 | `ocserv_sessions_by_client_type` | Gauge | server, client_type | Sessions by VPN client type |
 | `ocserv_user_concurrent_sessions` | Gauge | server, username | Current concurrent sessions per user |
-| `ocserv_session_active_seconds_total` | Counter | server, username, vpn_ip, country, client_type | Cumulative seconds the session was observed active by occtl polling |
+| `ocserv_session_active_seconds_total` | Counter | server, username, vpn_ip, device, country, client_type | Cumulative seconds the session was observed active by occtl polling |
 
 > **Breaking change:** `ocserv_server_rx_bytes_total` and `ocserv_server_tx_bytes_total` were renamed to drop the `_total` suffix — they are gauges (the underlying `occtl show status` counter can drop on `occtl reset stats` or process restart), and Prometheus convention reserves `_total` for monotonic counters. Update any saved queries / dashboards that referenced the old names.
 
@@ -149,12 +149,33 @@ Import `grafana/dashboard.json` to Grafana.
 Dashboard includes:
 - Active sessions overview
 - Connections/disconnections over time
-- Traffic by user
+- Traffic by user: live (see below) and per finished session (journal)
 - Disconnect reasons pie chart
 - Reconnects & problematic sessions
 - Top users by traffic
 - Failed authentication attempts
 - Connections by country (GeoIP)
+
+### Live traffic by user
+
+Journal-based traffic counters (`ocserv_received_bytes_total` / `ocserv_sent_bytes_total`) grow only when a session ends, so they show a spike at disconnect, not current usage. The "Live Traffic by User" row instead takes the per-interface counters of [node_exporter](https://github.com/prometheus/node_exporter) running on the ocserv host and maps each session's tun interface to its user via the `device` label of `ocserv_session_info`:
+
+```promql
+sum by (server, username) (
+  (rate(node_network_receive_bytes_total{instance="$node"}[$__rate_interval])
+ + rate(node_network_transmit_bytes_total{instance="$node"}[$__rate_interval])) * 8
+  * on (device) group_left (server, username)
+    group by (device, server, username) (
+      topk by (device) (1, ocserv_session_info{device!=""})
+    )
+)
+```
+
+Requires node_exporter on the same host as ocserv (pick it in the `node` variable) and occtl integration enabled — `device` comes from `occtl show users`. `topk by (device)` keeps only the newest session per interface (the value of `ocserv_session_info` is the session start time), so a reused interface name never joins two users at once. Right after reuse, traffic is attributed to the previous user until the next occtl poll and scrape, and for one more rate window it mixes the tail of the old session into the new owner. `$__rate_interval` assumes the Prometheus datasource in Grafana has the real scrape interval of node_exporter set: with a too short value the rate window holds a single sample and the panel stays empty.
+
+The `node` variable lists hosts with `vpns*` or `ocserv*` interfaces — adjust its regex if `device` in ocserv.conf uses another prefix. With several ocserv hosts sharing interface names, `ocserv_session_info` is not separated by host, so point each dashboard at one host.
+
+Adding `device` changes the label set of `ocserv_session_active_seconds_total`, so its series restart once on upgrade: panels that take `max by` over sessions (Session History) undercount once over a range spanning the upgrade.
 
 ## GeoIP support
 
@@ -211,7 +232,7 @@ sudo -u ocserv-exporter sudo -n occtl show status
 
 ### Note on traffic metrics
 
-Per-user traffic (`ocserv_received_bytes_total`, `ocserv_sent_bytes_total`) is only available at disconnect time - this is a limitation of ocserv logging, not the exporter. The `occtl` integration provides **server-level** traffic via `ocserv_server_rx_bytes` and `ocserv_server_tx_bytes` (gauges, updated each `--occtl.interval`).
+Per-user traffic counters (`ocserv_received_bytes_total`, `ocserv_sent_bytes_total`) are only updated at disconnect time - this is a limitation of ocserv logging, not the exporter. For current per-user traffic see [Live traffic by user](#live-traffic-by-user). The `occtl` integration provides **server-level** traffic via `ocserv_server_rx_bytes` and `ocserv_server_tx_bytes` (gauges, updated each `--occtl.interval`).
 
 ## Building
 
