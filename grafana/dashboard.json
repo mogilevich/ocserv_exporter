@@ -371,7 +371,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Bytes per user over the dashboard time range, including sessions still open: interface rates are joined with the user minute by minute and summed, so reconnects and interface changes do not matter. Data starts with the device label (ocserv_exporter v1.2.0).",
+      "description": "Bytes per user over the dashboard time range, including sessions still open: interface rates are joined with the user every 5 minutes and summed, so reconnects and interface changes do not matter (within ~1% of total tun traffic). Data starts with the device label (ocserv_exporter v1.2.0); ranges longer than ~340 days exceed the subquery point limit.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -449,7 +449,7 @@
       },
       "targets": [
         {
-          "expr": "topk(20, sum_over_time((sum by (server, username) ((rate(node_network_receive_bytes_total{instance=\"$node\"}[2m]) + rate(node_network_transmit_bytes_total{instance=\"$node\"}[2m])) * on (device) group_left (server, username) group by (device, server, username) (topk by (device) (1, ocserv_session_info{server=~\"$server\",username=~\"$username\",device!=\"\"}))))[$__range:1m]) * 60)",
+          "expr": "topk(20, sum_over_time((sum by (server, username) ((rate(node_network_receive_bytes_total{instance=\"$node\"}[5m]) + rate(node_network_transmit_bytes_total{instance=\"$node\"}[5m])) * on (device) group_left (server, username) group by (device, server, username) (topk by (device) (1, ocserv_session_info{server=~\"$server\",username=~\"$username\",device!=\"\"}))))[$__range:5m]) * 300)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
