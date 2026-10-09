@@ -303,7 +303,7 @@
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
-        "orientation": "auto",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -312,8 +312,12 @@
           "values": false
         },
         "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "text": {
+          "titleSize": 18,
+          "valueSize": 22
+        }
       },
       "pluginVersion": "12.3.0",
       "targets": [
@@ -361,7 +365,7 @@
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
-        "orientation": "auto",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -370,8 +374,12 @@
           "values": false
         },
         "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "text": {
+          "titleSize": 18,
+          "valueSize": 22
+        }
       },
       "pluginVersion": "12.3.0",
       "targets": [
