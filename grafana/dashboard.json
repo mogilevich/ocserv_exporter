@@ -327,8 +327,8 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
+        "h": 10,
+        "w": 15,
         "x": 0,
         "y": 11
       },
@@ -367,12 +367,123 @@
       "description": "Per-instance throughput: node_exporter counters of the session tun interfaces summed by server. TX is towards clients (download), RX from clients. occtl server RX/TX only grows at disconnect, so it is not used here."
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Bytes per user over the dashboard time range, including sessions still open: interface rates are joined with the user minute by minute and summed, so reconnects and interface changes do not matter. Data starts with the device label (ocserv_exporter v1.2.0).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 170
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 9,
+        "x": 15,
+        "y": 11
+      },
+      "id": 39,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Volume"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "topk(20, sum_over_time((sum by (server, username) ((rate(node_network_receive_bytes_total{instance=\"$node\"}[2m]) + rate(node_network_transmit_bytes_total{instance=\"$node\"}[2m])) * on (device) group_left (server, username) group by (device, server, username) (topk by (device) (1, ocserv_session_info{server=~\"$server\",username=~\"$username\",device!=\"\"}))))[$__range:1m]) * 60)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Traffic Volume by User",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Volume"
+            },
+            "indexByName": {
+              "username": 0,
+              "server": 1,
+              "Volume": 2
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 21
       },
       "id": 100,
       "panels": [],
@@ -407,7 +518,7 @@
         "h": 5,
         "w": 4,
         "x": 0,
-        "y": 20
+        "y": 22
       },
       "id": 20,
       "options": {
@@ -469,7 +580,7 @@
         "h": 5,
         "w": 4,
         "x": 4,
-        "y": 20
+        "y": 22
       },
       "id": 21,
       "options": {
@@ -531,7 +642,7 @@
         "h": 5,
         "w": 4,
         "x": 8,
-        "y": 20
+        "y": 22
       },
       "id": 22,
       "options": {
@@ -605,7 +716,7 @@
         "h": 5,
         "w": 4,
         "x": 12,
-        "y": 20
+        "y": 22
       },
       "id": 23,
       "options": {
@@ -672,7 +783,7 @@
         "h": 5,
         "w": 4,
         "x": 16,
-        "y": 20
+        "y": 22
       },
       "id": 24,
       "options": {
@@ -738,7 +849,7 @@
         "h": 5,
         "w": 4,
         "x": 20,
-        "y": 20
+        "y": 22
       },
       "id": 25,
       "options": {
@@ -801,7 +912,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 25
+        "y": 27
       },
       "id": 1,
       "options": {
@@ -897,7 +1008,7 @@
         "h": 8,
         "w": 20,
         "x": 4,
-        "y": 25
+        "y": 27
       },
       "id": 7,
       "options": {
@@ -949,7 +1060,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 33
+        "y": 35
       },
       "id": 27,
       "options": {
@@ -1038,7 +1149,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 33
+        "y": 35
       },
       "id": 29,
       "options": {
@@ -1209,7 +1320,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 44
       },
       "id": 30,
       "options": {
@@ -1301,7 +1412,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 52
+        "y": 54
       },
       "id": 34,
       "options": {
@@ -1386,7 +1497,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 52
+        "y": 54
       },
       "id": 15,
       "options": {
@@ -1500,7 +1611,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 60
+        "y": 62
       },
       "id": 31,
       "options": {
@@ -1618,7 +1729,7 @@
         "h": 9,
         "w": 8,
         "x": 8,
-        "y": 60
+        "y": 62
       },
       "id": 32,
       "options": {
@@ -1724,7 +1835,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 60
+        "y": 62
       },
       "id": 35,
       "options": {
@@ -1795,7 +1906,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 69
+        "y": 71
       },
       "id": 101,
       "panels": [],
@@ -1834,7 +1945,7 @@
         "h": 5,
         "w": 6,
         "x": 0,
-        "y": 70
+        "y": 72
       },
       "id": 3,
       "options": {
@@ -1893,7 +2004,7 @@
         "h": 5,
         "w": 6,
         "x": 6,
-        "y": 70
+        "y": 72
       },
       "id": 4,
       "options": {
@@ -1944,7 +2055,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 70
+        "y": 72
       },
       "id": 5,
       "options": {
@@ -1968,8 +2079,9 @@
           "refId": "A"
         }
       ],
-      "title": "Traffic",
-      "type": "stat"
+      "title": "Traffic (finished sessions)",
+      "type": "stat",
+      "description": "Bytes of sessions that ended in the range. Counted when a session ends, so open sessions are missing and the bytes land at disconnect time. Before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal, so ranges spanning such restarts are inflated. For volume per user use Traffic Volume by User."
     },
     {
       "datasource": {
@@ -2003,7 +2115,7 @@
         "h": 5,
         "w": 6,
         "x": 18,
-        "y": 70
+        "y": 72
       },
       "id": 6,
       "options": {
@@ -2089,7 +2201,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 75
+        "y": 77
       },
       "id": 8,
       "options": {
@@ -2178,7 +2290,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 75
+        "y": 77
       },
       "id": 9,
       "options": {
@@ -2206,7 +2318,7 @@
       ],
       "title": "Traffic by User (finished sessions)",
       "type": "timeseries",
-      "description": "Bytes of sessions that ended in each interval: ocserv logs per-user traffic only at disconnect. Top 10 users over the range. For current traffic see Live Traffic by User.",
+      "description": "Bytes of sessions that ended in each interval, top 10 users over the range. Counted when a session ends, so open sessions are missing and the bytes land at disconnect time. Before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal, so ranges spanning such restarts are inflated. For volume per user use Traffic Volume by User.",
       "interval": "5m"
     },
     {
@@ -2235,7 +2347,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 83
+        "y": 85
       },
       "id": 11,
       "options": {
@@ -2329,7 +2441,7 @@
         "h": 9,
         "w": 8,
         "x": 8,
-        "y": 83
+        "y": 85
       },
       "id": 13,
       "options": {
@@ -2359,7 +2471,7 @@
           "refId": "A"
         }
       ],
-      "title": "Top Users by Traffic",
+      "title": "Top Users by Traffic (finished sessions)",
       "transformations": [
         {
           "id": "organize",
@@ -2373,7 +2485,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Bytes of sessions that ended in the range. Counted when a session ends, so open sessions are missing and the bytes land at disconnect time. Before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal, so ranges spanning such restarts are inflated. For volume per user use Traffic Volume by User."
     },
     {
       "datasource": {
@@ -2466,7 +2579,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 83
+        "y": 85
       },
       "id": 14,
       "options": {
@@ -2577,7 +2690,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 92
+        "y": 94
       },
       "id": 19,
       "options": {
@@ -2677,7 +2790,7 @@
         "h": 9,
         "w": 8,
         "x": 8,
-        "y": 92
+        "y": 94
       },
       "id": 18,
       "options": {
@@ -2755,7 +2868,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 92
+        "y": 94
       },
       "id": 12,
       "options": {
@@ -2881,7 +2994,7 @@
         "h": 9,
         "w": 8,
         "x": 0,
-        "y": 101
+        "y": 103
       },
       "id": 17,
       "options": {
@@ -2960,7 +3073,7 @@
         "h": 9,
         "w": 8,
         "x": 8,
-        "y": 101
+        "y": 103
       },
       "id": 33,
       "options": {
@@ -3054,7 +3167,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 101
+        "y": 103
       },
       "id": 16,
       "options": {
