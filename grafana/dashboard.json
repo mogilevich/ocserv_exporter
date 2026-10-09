@@ -371,7 +371,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Bytes per user over the dashboard time range, including sessions still open: interface rates are joined with the user every 5 minutes and summed, so reconnects and interface changes do not matter (within ~1% of total tun traffic). Data starts with the device label (ocserv_exporter v1.2.0); ranges longer than ~340 days exceed the subquery point limit.",
+      "description": "Bytes per user over the dashboard time range, including sessions still open: interface rates are joined with the user every 5 minutes and summed, so reconnects and interface changes do not matter (within ~1% of total tun traffic). Data starts with the device label (ocserv_exporter v1.2.0). Reliable up to the first downsampling period of the datasource: on VictoriaMetrics with downsampling, a range starting in a downsampled tier makes the 5m rates meaningless, and ranges longer than ~340 days hit the subquery point limit.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2081,7 +2081,7 @@
       ],
       "title": "Traffic (finished sessions)",
       "type": "stat",
-      "description": "Bytes of sessions that ended in the range. Counted when a session ends, so open sessions are missing and the bytes land at disconnect time. Before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal, so ranges spanning such restarts are inflated. For volume per user use Traffic Volume by User."
+      "description": "Bytes of sessions that ended in the range. Approximate: the counters grow in jumps at disconnect and per-user series come and go with exporter restarts, so increase() over long ranges does not add up (a range and the sum of its parts differed by 20-30% in practice). Good for ranking users, not for exact volume. Open sessions are missing; before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal. For exact recent volume use Traffic Volume by User."
     },
     {
       "datasource": {
@@ -2318,7 +2318,7 @@
       ],
       "title": "Traffic by User (finished sessions)",
       "type": "timeseries",
-      "description": "Bytes of sessions that ended in each interval, top 10 users over the range. Counted when a session ends, so open sessions are missing and the bytes land at disconnect time. Before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal, so ranges spanning such restarts are inflated. For volume per user use Traffic Volume by User.",
+      "description": "Bytes of sessions that ended in each interval, top 10 users over the range. Approximate: the counters grow in jumps at disconnect and per-user series come and go with exporter restarts, so increase() over long ranges does not add up (a range and the sum of its parts differed by 20-30% in practice). Good for ranking users, not for exact volume. Open sessions are missing; before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal. For exact recent volume use Traffic Volume by User.",
       "interval": "5m"
     },
     {
@@ -2486,7 +2486,7 @@
         }
       ],
       "type": "table",
-      "description": "Bytes of sessions that ended in the range. Counted when a session ends, so open sessions are missing and the bytes land at disconnect time. Before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal, so ranges spanning such restarts are inflated. For volume per user use Traffic Volume by User."
+      "description": "Bytes of sessions that ended in the range. Approximate: the counters grow in jumps at disconnect and per-user series come and go with exporter restarts, so increase() over long ranges does not add up (a range and the sum of its parts differed by 20-30% in practice). Good for ranking users, not for exact volume. Open sessions are missing; before ocserv_exporter v1.2.2 every exporter restart re-counted the replayed journal. For exact recent volume use Traffic Volume by User."
     },
     {
       "datasource": {
